@@ -452,5 +452,5 @@ export async function adminGetMessages() {
 export async function adminGetSettings() {
   await requireAuth();
   const settings = await prisma.siteSetting.findMany();
-  return Object.fromEntries(settings.map((s) => [s.key, s.value]));
+  return Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
 }
