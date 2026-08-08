@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MR SHEIN — Paulin N'ZIAN Personal Shopper
 
-## Getting Started
+Plateforme Full Stack professionnelle pour l'activité de Personal Shopper de Paulin N'ZIAN.
 
-First, run the development server:
+## Stack technique
+
+- **Frontend** : Next.js 16, TypeScript, Tailwind CSS, Framer Motion, Lucide Icons
+- **Backend** : Next.js Server Actions
+- **Base de données** : PostgreSQL + Prisma ORM
+- **Authentification** : NextAuth / Auth.js (JWT)
+- **Validation** : Zod + React Hook Form
+- **Notifications** : Sonner (toasts)
+- **PWA** : installable sur smartphone
+
+---
+
+## Installation
+
+```bash
+npm install
+cp .env.example .env
+# Éditez .env avec vos vraies valeurs
+```
+
+## Configuration PostgreSQL
+
+```sql
+CREATE DATABASE mrshein;
+```
+
+Mettez votre DATABASE_URL dans .env.
+
+## Migration et seed
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+npm run db:seed
+```
+
+Crédentiels admin créés par le seed :
+- Email    : admin@mrshein.fr
+- Password : Admin@2026!
+
+**Changez ce mot de passe immédiatement en production.**
+
+## Lancement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Site : http://localhost:3000  
+Admin : http://localhost:3000/admin
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Pages publiques
 
-To learn more about Next.js, take a look at the following resources:
+| URL | Description |
+|-----|-------------|
+| / | Accueil |
+| /boutiques | Boutiques en ligne |
+| /tarifs | Taux de change & expédition |
+| /suivi | Suivi de commande |
+| /comment-ca-marche | Guide du service |
+| /contact | Contact |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Dashboard Admin
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| URL | Description |
+|-----|-------------|
+| /admin/login | Connexion |
+| /admin | Dashboard |
+| /admin/commandes | Commandes & suivi colis |
+| /admin/boutiques | Boutiques |
+| /admin/tarifs | Tarifs |
+| /admin/temoignages | Témoignages |
+| /admin/faq | FAQ |
+| /admin/messages | Messages clients |
+| /admin/parametres | Paramètres du site |
 
-## Deploy on Vercel
+## Variables d'environnement
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Description |
+|----------|-------------|
+| DATABASE_URL | URL PostgreSQL |
+| AUTH_SECRET | Clé secrète NextAuth (min 32 chars) |
+| NEXTAUTH_URL | URL complète de l'app |
+| NEXT_PUBLIC_APP_URL | URL publique |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Commandes
+
+```bash
+npm run dev           # Développement
+npm run build         # Build production
+npm run db:generate   # Prisma generate
+npm run db:migrate    # Migration
+npm run db:seed       # Seed base de données
+npm run db:studio     # Prisma Studio GUI
+```
+
+## Déploiement Vercel
+
+1. Connectez le repo à Vercel
+2. Ajoutez les variables d'environnement
+3. Déployez — Vercel exécute automatiquement le build
+
+© 2026 Paulin N'ZIAN — Personal Shopper

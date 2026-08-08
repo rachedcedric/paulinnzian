@@ -1,0 +1,23 @@
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { Toaster } from "sonner";
+
+export default async function AdminDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+  if (!session?.user) redirect("/admin/login");
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <AdminSidebar />
+      <div className="flex-1 lg:ml-64 min-h-screen">
+        {children}
+      </div>
+      <Toaster richColors position="top-right" />
+    </div>
+  );
+}

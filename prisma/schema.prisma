@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum OrderStatus {
+  PENDING
+  PURCHASED
+  RECEIVED_PARIS
+  SHIPPED_DESTINATION
+  ARRIVED_DESTINATION
+  DELIVERED
+  CANCELLED
+}
+
+enum PricingType {
+  PER_KG
+  PERCENTAGE
+  FIXED
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+model Store {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  logo         String?
+  websiteUrl   String
+  category     String
+  description  String?
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("stores")
+}
+
+model ExchangeRate {
+  id           String   @id @default(cuid())
+  name         String
+  rate         Float
+  currencyFrom String   @default("EUR")
+  currencyTo   String   @default("XOF")
+  description  String?
+  isActive     Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+
+  @@map("exchange_rates")
+}
+
+model ShippingRate {
+  id                String      @id @default(cuid())
+  name              String
+  pricingType       PricingType
+  price             Float?
+  percentage        Float?
+  description       String?
+  estimatedDelivery String?
+  isActive          Boolean     @default(true)
+  displayOrder      Int         @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@map("shipping_rates")
+}
+
+model Order {
+  id                 String          @id @default(cuid())
+  trackingNumber     String          @unique
+  customerName       String
+  customerPhone      String
+  customerEmail      String?
+  storeName          String?
+  storeOrderNumber   String?
+  amount             Float?
+  packageCount       Int?
+  weight             Float?
+  destinationCity    String
+  destinationCountry String
+  internalNotes      String?
+  status             OrderStatus     @default(PENDING)
+  orderDate          DateTime        @default(now())
+  trackingEvents     TrackingEvent[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@map("orders")
+}
+
+model TrackingEvent {
+  id           String      @id @default(cuid())
+  orderId      String
+  order        Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status       OrderStatus
+  title        String
+  description  String?
+  location     String?
+  eventDate    DateTime
+  displayOrder Int         @default(0)
+  createdAt    DateTime    @default(now())
+
+  @@map("tracking_events")
+}
+
+model Testimonial {
+  id           String   @id @default(cuid())
+  name         String
+  photo        String?
+  rating       Int      @default(5)
+  comment      String
+  isPublished  Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+model FAQ {
+  id           String   @id @default(cuid())
+  question     String
+  answer       String
+  isPublished  Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("faqs")
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  subject   String
+  message   String
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("contact_messages")
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("site_settings")
+}
