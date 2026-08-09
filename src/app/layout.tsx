@@ -6,6 +6,8 @@ import { Footer } from "@/components/layout/Footer";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
 import { Toaster } from "sonner";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
+import { MarketingTracking } from "@/components/analytics/MarketingTracking";
+import { getSiteSettings } from "@/actions/public";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,11 +54,13 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettings();
+
   return (
     <html lang="fr" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
@@ -64,6 +68,12 @@ export default function RootLayout({
           {children}
         </LayoutWrapper>
         <Toaster richColors position="top-right" />
+        <MarketingTracking
+          facebookPixelId={settings.facebook_pixel_id}
+          googleAdsId={settings.google_ads_id}
+          googleAnalyticsId={settings.google_analytics_id}
+          tiktokPixelId={settings.tiktok_pixel_id}
+        />
       </body>
     </html>
   );
