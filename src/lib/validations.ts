@@ -63,7 +63,7 @@ export const faqSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email("Email invalide"),
+  email: z.string().trim().toLowerCase().email("Email invalide"),
   password: z.string().min(6, "Mot de passe trop court"),
 });
 
