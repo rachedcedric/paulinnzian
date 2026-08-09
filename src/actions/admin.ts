@@ -19,6 +19,10 @@ async function requireAuth() {
   return session;
 }
 
+function normalizePhone(phone: string) {
+  return phone.replace(/\D/g, "");
+}
+
 // ─── STORES ───────────────────────────────────────────────────────────────────
 export async function createStore(data: unknown) {
   await requireAuth();
@@ -103,17 +107,33 @@ export async function createOrder(data: unknown) {
 
   try {
     const { orderDate, ...rest } = parsed.data;
-    const order = await prisma.order.create({
-      data: {
-        ...rest,
-        customerEmail: rest.customerEmail || null,
-        storeName: rest.storeName || null,
-        storeOrderNumber: rest.storeOrderNumber || null,
-        internalNotes: rest.internalNotes || null,
-        orderDate: orderDate ? new Date(orderDate) : new Date(),
-      },
+    const order = await prisma.$transaction(async (transaction) => {
+      await transaction.client.upsert({
+        where: { phone: normalizePhone(rest.customerPhone) },
+        update: {
+          name: rest.customerName,
+          ...(rest.customerEmail ? { email: rest.customerEmail } : {}),
+        },
+        create: {
+          name: rest.customerName,
+          phone: normalizePhone(rest.customerPhone),
+          email: rest.customerEmail || null,
+        },
+      });
+
+      return transaction.order.create({
+        data: {
+          ...rest,
+          customerEmail: rest.customerEmail || null,
+          storeName: rest.storeName || null,
+          storeOrderNumber: rest.storeOrderNumber || null,
+          internalNotes: rest.internalNotes || null,
+          orderDate: orderDate ? new Date(orderDate) : new Date(),
+        },
+      });
     });
     revalidatePath("/admin/commandes");
+    revalidatePath("/admin/clients");
     return { success: true, order };
   } catch {
     return { success: false, error: "Erreur lors de la création" };
@@ -127,18 +147,34 @@ export async function updateOrder(id: string, data: unknown) {
 
   try {
     const { orderDate, ...rest } = parsed.data;
-    const order = await prisma.order.update({
-      where: { id },
-      data: {
-        ...rest,
-        customerEmail: rest.customerEmail || null,
-        storeName: rest.storeName || null,
-        storeOrderNumber: rest.storeOrderNumber || null,
-        internalNotes: rest.internalNotes || null,
-        ...(orderDate ? { orderDate: new Date(orderDate) } : {}),
-      },
+    const order = await prisma.$transaction(async (transaction) => {
+      await transaction.client.upsert({
+        where: { phone: normalizePhone(rest.customerPhone) },
+        update: {
+          name: rest.customerName,
+          ...(rest.customerEmail ? { email: rest.customerEmail } : {}),
+        },
+        create: {
+          name: rest.customerName,
+          phone: normalizePhone(rest.customerPhone),
+          email: rest.customerEmail || null,
+        },
+      });
+
+      return transaction.order.update({
+        where: { id },
+        data: {
+          ...rest,
+          customerEmail: rest.customerEmail || null,
+          storeName: rest.storeName || null,
+          storeOrderNumber: rest.storeOrderNumber || null,
+          internalNotes: rest.internalNotes || null,
+          ...(orderDate ? { orderDate: new Date(orderDate) } : {}),
+        },
+      });
     });
     revalidatePath("/admin/commandes");
+    revalidatePath("/admin/clients");
     return { success: true, order };
   } catch {
     return { success: false, error: "Erreur lors de la mise à jour" };
@@ -409,6 +445,79 @@ export async function adminGetOrders(filters?: {
     orderBy: { createdAt: "desc" },
     include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },
   });
+}
+
+export async function adminGetClients() {
+  await requireAuth();
+
+  const [clients, orderCounts] = await Promise.all([
+    prisma.client.findMany({ orderBy: { name: "asc" } }),
+    prisma.order.groupBy({
+      by: ["customerPhone"],
+      _count: { _all: true },
+    }),
+  ]);
+
+  const counts = new Map<string, number>();
+  for (const item of orderCounts) {
+    const phone = normalizePhone(item.customerPhone);
+    counts.set(phone, (counts.get(phone) ?? 0) + item._count._all);
+  }
+
+  return clients.map((client) => ({
+    ...client,
+    createdAt: client.createdAt.toISOString(),
+    updatedAt: client.updatedAt.toISOString(),
+    orderCount: counts.get(client.phone) ?? 0,
+  }));
+}
+
+const clientSchema = z.object({
+  name: z.string().trim().min(2, "Le nom est requis"),
+  phone: z.string().min(8, "Numéro de téléphone invalide"),
+  email: z.string().email("Email invalide").optional().or(z.literal("")),
+});
+
+export async function updateClient(id: string, data: unknown) {
+  await requireAuth();
+  const parsed = clientSchema.safeParse(data);
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+
+  try {
+    const client = await prisma.client.update({
+      where: { id },
+      data: {
+        name: parsed.data.name,
+        phone: normalizePhone(parsed.data.phone),
+        email: parsed.data.email || null,
+      },
+    });
+    revalidatePath("/admin/clients");
+    return {
+      success: true,
+      client: {
+        ...client,
+        createdAt: client.createdAt.toISOString(),
+        updatedAt: client.updatedAt.toISOString(),
+      },
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
+      return { success: false, error: "Ce numéro est déjà utilisé par un autre client" };
+    }
+    return { success: false, error: "Erreur lors de la modification" };
+  }
+}
+
+export async function deleteClient(id: string) {
+  await requireAuth();
+  try {
+    await prisma.client.delete({ where: { id } });
+    revalidatePath("/admin/clients");
+    return { success: true };
+  } catch {
+    return { success: false, error: "Erreur lors de la suppression" };
+  }
 }
 
 export async function adminGetOrder(id: string) {

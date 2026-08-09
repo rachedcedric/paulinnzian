@@ -114,6 +114,17 @@ model Order {
   @@map("orders")
 }
 
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clients")
+}
+
 model TrackingEvent {
   id           String      @id @default(cuid())
   orderId      String

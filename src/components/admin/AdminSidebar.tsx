@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, Store, DollarSign, Star, HelpCircle,
-  MessageSquare, Settings, LogOut, ShoppingBag, Menu, X,
+  MessageSquare, Settings, LogOut, ShoppingBag, Menu, X, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -13,6 +13,7 @@ import { useState } from "react";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/commandes", label: "Commandes", icon: Package },
+  { href: "/admin/clients", label: "Clients", icon: Users },
   { href: "/admin/boutiques", label: "Boutiques", icon: Store },
   { href: "/admin/tarifs", label: "Tarifs", icon: DollarSign },
   { href: "/admin/temoignages", label: "Témoignages", icon: Star },
