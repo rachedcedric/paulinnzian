@@ -9,7 +9,7 @@ import { createOrder, updateOrder, deleteOrder, addTrackingEvent, deleteTracking
 import { orderSchema, trackingEventSchema, type OrderFormData, type TrackingEventFormData } from "@/lib/validations";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/types";
 import type { Order } from "@/types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateInput } from "@/lib/utils";
 
 const STATUS_OPTIONS = Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({ value, label }));
 
@@ -91,7 +91,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
             className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
           />
           <button
-            onClick={() => { setEditing(null); reset({ status: "PENDING", destinationCountry: "Côte d'Ivoire", destinationCity: "Abidjan" }); setShowForm(true); }}
+            onClick={() => { setEditing(null); reset({ status: "PENDING", destinationCountry: "Côte d'Ivoire", destinationCity: "Abidjan", orderDate: formatDateInput() }); setShowForm(true); }}
             className="flex items-center gap-2 bg-[#FF6500] text-white px-5 py-2.5 rounded-xl font-semibold"
           >
             <Plus className="w-5 h-5" />Créer
