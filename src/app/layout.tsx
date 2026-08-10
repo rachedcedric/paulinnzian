@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://mrshein.fr",
+    url: "https://paulinnzian.com",
     siteName: "MR SHEIN - Personal Shopper",
     title: "Paulin N'ZIAN - Personal Shopper | Achetez moins cher en Europe",
     description: "Personal Shopper pour vos achats en Europe. Réexpédition vers Abidjan et destinations africaines.",
