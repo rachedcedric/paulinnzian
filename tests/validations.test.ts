@@ -41,6 +41,7 @@ test("orders and tracking events require valid business dates", () => {
     orderDate: "2026-08-10",
   };
   assert.equal(orderSchema.parse(order).trackingNumber, "PNZ-2026-001");
+  assert.equal(orderSchema.parse({ ...order, weight: "" }).weight, undefined);
   assert.equal(orderSchema.safeParse({ ...order, orderDate: "10/08/2026" }).success, false);
   assert.equal(trackingEventSchema.safeParse({
     orderId: "order-1",

@@ -31,7 +31,10 @@ export const orderSchema = z.object({
   storeOrderNumber: z.string().trim().max(100).optional(),
   amount: z.coerce.number().finite().positive().max(1_000_000_000).optional(),
   packageCount: z.coerce.number().int().positive().max(10_000).optional(),
-  weight: z.coerce.number().finite().positive().max(100_000).optional(),
+  weight: z.preprocess(
+    (value) => value === "" || value === null ? undefined : value,
+    z.coerce.number().finite().positive().max(100_000).optional(),
+  ),
   destinationCity: z.string().trim().min(1, "La ville est requise").max(100),
   destinationCountry: z.string().trim().min(1, "Le pays est requis").max(100),
   internalNotes: z.string().trim().max(5_000).optional(),

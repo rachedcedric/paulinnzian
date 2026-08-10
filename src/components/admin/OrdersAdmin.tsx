@@ -140,7 +140,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
                   <input {...register("amount")} type="number" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Nb colis</label>
                   <input {...register("packageCount")} type="number" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
-                <div><label className="block text-xs font-semibold mb-1">Poids (kg) <span className="font-normal text-gray-400">— renseigné à l'arrivée</span></label>
+                <div><label className="block text-xs font-semibold mb-1">Poids (kg) <span className="font-normal text-gray-400">(facultatif, renseigné à l'arrivée)</span></label>
                   <input {...register("weight")} type="number" step="0.1" placeholder="ex: 1.3" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
