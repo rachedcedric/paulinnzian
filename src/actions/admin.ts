@@ -696,15 +696,6 @@ export async function deleteClient(id: string) {
   }
 }
 
-export async function adminGetOrder(id: string) {
-  await requireViewer();
-  if (!isValidEntityId(id)) return null;
-  return prisma.order.findUnique({
-    where: { id },
-    include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },
-  });
-}
-
 export async function adminGetStores() {
   await requireViewer();
   return prisma.store.findMany({ orderBy: { displayOrder: "asc" } });

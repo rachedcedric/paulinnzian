@@ -4,9 +4,19 @@ import { motion } from "framer-motion";
 import { ShieldCheck, Package, Plane, MessageCircle, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { useSiteConfig } from "@/components/layout/SiteConfigContext";
+import type { ExchangeRate } from "@/types";
 
-export function HeroSection() {
+function formatExchangeRate(rate?: ExchangeRate) {
+  if (!rate) return "Non configuré";
+  const source = rate.currencyFrom === "EUR" ? "€" : rate.currencyFrom;
+  const target = rate.currencyTo === "XOF" ? "FCFA" : rate.currencyTo;
+  return `${new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 }).format(rate.rate)} ${target}/${source}`;
+}
+
+export function HeroSection({ exchangeRates }: { exchangeRates: ExchangeRate[] }) {
   const { whatsappUrl, heroTitle, heroSubtitle } = useSiteConfig();
+  const sheinRate = exchangeRates.find((rate) => rate.name.toLowerCase().includes("shein"));
+  const otherRate = exchangeRates.find((rate) => rate.id !== sheinRate?.id);
   return (
     <section className="min-h-screen bg-white flex items-center pt-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
@@ -74,8 +84,8 @@ export function HeroSection() {
                 {[
                   { icon: Package, label: "Boutiques disponibles", value: "26+" },
                   { icon: Plane, label: "Réexpédition vers", value: "Abidjan & +" },
-                  { icon: TrendingDown, label: "Taux SHEIN", value: "655 FCFA/€" },
-                  { icon: TrendingDown, label: "Autres boutiques", value: "670 FCFA/€" },
+                  { icon: TrendingDown, label: sheinRate?.name || "Taux SHEIN", value: formatExchangeRate(sheinRate) },
+                  { icon: TrendingDown, label: otherRate?.name || "Autres boutiques", value: formatExchangeRate(otherRate) },
                 ].map((stat) => (
                   <motion.div
                     key={stat.label}

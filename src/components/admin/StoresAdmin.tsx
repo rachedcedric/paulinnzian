@@ -188,6 +188,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                         src={logoPreview}
                         alt="Logo preview"
                         fill
+                        sizes="96px"
                         className="object-cover"
                       />
                     </div>
@@ -332,6 +333,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                           src={store.logo}
                           alt={store.name}
                           fill
+                          sizes="40px"
                           className="object-cover"
                         />
                       </div>

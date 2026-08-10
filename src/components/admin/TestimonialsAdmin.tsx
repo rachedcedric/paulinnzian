@@ -89,6 +89,11 @@ export function TestimonialsAdmin({ initialData }: { initialData: Testimonial[] 
       )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.length === 0 && (
+          <div className="sm:col-span-2 lg:col-span-3 rounded-2xl bg-white p-10 text-center text-sm text-gray-400 shadow-sm">
+            Aucun témoignage enregistré.
+          </div>
+        )}
         {items.map((item) => (
           <div key={item.id} className="bg-white rounded-2xl p-5 shadow-sm">
             <div className="flex justify-between items-start mb-3">

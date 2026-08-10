@@ -6,19 +6,20 @@ import { ComparisonSection } from "@/components/home/ComparisonSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { ContactSection } from "@/components/home/ContactSection";
-import { getTestimonials, getFAQs } from "@/actions/public";
+import { getTestimonials, getFAQs, getExchangeRates } from "@/actions/public";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [testimonials, faqs] = await Promise.all([
+  const [testimonials, faqs, exchangeRates] = await Promise.all([
     getTestimonials(),
     getFAQs(),
+    getExchangeRates(),
   ]);
 
   return (
     <>
-      <HeroSection />
+      <HeroSection exchangeRates={exchangeRates} />
       <HomeTrackingSection />
       <WhyChooseSection />
       <HowToOrderSection />
