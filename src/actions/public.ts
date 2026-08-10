@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { contactSchema } from "@/lib/validations";
+import { contactSchema, trackingLookupSchema } from "@/lib/validations";
 import { consumeRateLimit, getRequestFingerprint } from "@/lib/rate-limit";
 import { revalidatePath } from "next/cache";
 
@@ -105,11 +105,12 @@ export async function getSiteSettings() {
 }
 
 export async function trackOrder(trackingNumber: string) {
-  if (!trackingNumber || trackingNumber.length < 3) {
+  const parsed = trackingLookupSchema.safeParse(trackingNumber);
+  if (!parsed.success) {
     return { success: false, error: "Numéro de suivi invalide" };
   }
 
-  const key = trackingNumber.trim().toUpperCase();
+  const key = parsed.data;
   const fingerprint = await getRequestFingerprint();
   const [visitorLimit, lookupLimit] = await Promise.all([
     consumeRateLimit("tracking-visitor", fingerprint, 10, 10 * 60 * 1000),

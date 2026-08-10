@@ -8,6 +8,9 @@ import {
   trackingEventSchema,
   testimonialSchema,
   faqSchema,
+  entityIdSchema,
+  exchangeRateUpdateSchema,
+  shippingRateUpdateSchema,
 } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
@@ -75,6 +78,12 @@ function normalizePhone(phone: string) {
   return phone.replace(/\D/g, "");
 }
 
+function isValidEntityId(id: string) {
+  return entityIdSchema.safeParse(id).success;
+}
+
+const invalidIdResult = { success: false as const, error: "Identifiant invalide" };
+
 // ─── STORES ───────────────────────────────────────────────────────────────────
 export async function createStore(data: unknown) {
   await requireManager();
@@ -93,6 +102,7 @@ export async function createStore(data: unknown) {
 
 export async function updateStore(id: string, data: unknown) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   const parsed = storeSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -108,6 +118,7 @@ export async function updateStore(id: string, data: unknown) {
 
 export async function deleteStore(id: string) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.store.delete({ where: { id } });
   revalidatePath("/boutiques");
   revalidatePath("/admin/boutiques");
@@ -116,6 +127,7 @@ export async function deleteStore(id: string) {
 
 export async function toggleStoreActive(id: string, isActive: boolean) {
   await requireManager();
+  if (!isValidEntityId(id) || typeof isActive !== "boolean") return { success: false, error: "Données invalides" };
   await prisma.store.update({ where: { id }, data: { isActive } });
   revalidatePath("/boutiques");
   revalidatePath("/admin/boutiques");
@@ -125,9 +137,11 @@ export async function toggleStoreActive(id: string, isActive: boolean) {
 // ─── EXCHANGE RATES ───────────────────────────────────────────────────────────
 export async function updateExchangeRate(id: string, rate: number, description?: string) {
   await requireSuperAdmin();
+  const parsed = exchangeRateUpdateSchema.safeParse({ id, rate, description });
+  if (!parsed.success) return { success: false, error: "Données invalides" };
   await prisma.exchangeRate.update({
-    where: { id },
-    data: { rate, ...(description ? { description } : {}), updatedAt: new Date() },
+    where: { id: parsed.data.id },
+    data: { rate: parsed.data.rate, ...(parsed.data.description ? { description: parsed.data.description } : {}), updatedAt: new Date() },
   });
   revalidatePath("/tarifs");
   revalidatePath("/admin/tarifs");
@@ -140,7 +154,10 @@ export async function updateShippingRate(
   data: { price?: number; percentage?: number; estimatedDelivery?: string; description?: string }
 ) {
   await requireSuperAdmin();
-  await prisma.shippingRate.update({ where: { id }, data });
+  const parsed = shippingRateUpdateSchema.safeParse({ id, ...data });
+  if (!parsed.success) return { success: false, error: "Données invalides" };
+  const { id: parsedId, ...validatedData } = parsed.data;
+  await prisma.shippingRate.update({ where: { id: parsedId }, data: validatedData });
   revalidatePath("/tarifs");
   revalidatePath("/admin/tarifs");
   return { success: true };
@@ -194,6 +211,7 @@ export async function createOrder(data: unknown) {
 
 export async function updateOrder(id: string, data: unknown) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   const parsed = orderSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -235,6 +253,7 @@ export async function updateOrder(id: string, data: unknown) {
 
 export async function deleteOrder(id: string) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.order.delete({ where: { id } });
   revalidatePath("/admin/commandes");
   return { success: true };
@@ -267,6 +286,7 @@ export async function addTrackingEvent(data: unknown) {
 
 export async function deleteTrackingEvent(id: string) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.$transaction(async (transaction) => {
     const event = await transaction.trackingEvent.delete({
       where: { id },
@@ -301,6 +321,7 @@ export async function createTestimonial(data: unknown) {
 
 export async function updateTestimonial(id: string, data: unknown) {
   await requireViewer();
+  if (!isValidEntityId(id)) return invalidIdResult;
   const parsed = testimonialSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -312,6 +333,7 @@ export async function updateTestimonial(id: string, data: unknown) {
 
 export async function deleteTestimonial(id: string) {
   await requireViewer();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.testimonial.delete({ where: { id } });
   revalidatePath("/");
   revalidatePath("/admin/temoignages");
@@ -332,6 +354,7 @@ export async function createFAQ(data: unknown) {
 
 export async function updateFAQ(id: string, data: unknown) {
   await requireViewer();
+  if (!isValidEntityId(id)) return invalidIdResult;
   const parsed = faqSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -343,6 +366,7 @@ export async function updateFAQ(id: string, data: unknown) {
 
 export async function deleteFAQ(id: string) {
   await requireViewer();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.fAQ.delete({ where: { id } });
   revalidatePath("/");
   revalidatePath("/admin/faq");
@@ -352,6 +376,7 @@ export async function deleteFAQ(id: string) {
 // ─── MESSAGES ─────────────────────────────────────────────────────────────────
 export async function markMessageRead(id: string) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.contactMessage.update({ where: { id }, data: { status: "READ" } });
   revalidatePath("/admin/messages");
   return { success: true };
@@ -359,6 +384,7 @@ export async function markMessageRead(id: string) {
 
 export async function deleteMessage(id: string) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.contactMessage.delete({ where: { id } });
   revalidatePath("/admin/messages");
   return { success: true };
@@ -421,6 +447,7 @@ export async function updateAdminUser(
   data: { name: string; role: AdminRole; password?: string },
 ) {
   const session = await requireSuperAdmin();
+  if (!isValidEntityId(id)) return invalidIdResult;
   const parsed = z.object({
     name: z.string().trim().min(2).max(100),
     role: z.enum(["SUPER_ADMIN", "ADMIN", "EDITOR"]),
@@ -455,6 +482,7 @@ export async function updateAdminUser(
 
 export async function deleteAdminUser(id: string) {
   const session = await requireSuperAdmin();
+  if (!isValidEntityId(id)) return invalidIdResult;
   if (session.user?.id === id) return { success: false, error: "Vous ne pouvez pas supprimer votre propre compte" };
 
   const target = await prisma.adminUser.findUnique({ where: { id }, select: { role: true } });
@@ -481,18 +509,19 @@ export async function getDashboardStats() {
 
   const revenueWhere = (from: Date) => ({
     status: { notIn: ["CANCELLED" as const] },
-    createdAt: { gte: from },
+    orderDate: { gte: from },
     amount: { not: null },
   });
 
   const weightWhere = (from?: Date) => ({
     weight: { not: null },
     status: { notIn: ["CANCELLED" as const] },
-    ...(from ? { createdAt: { gte: from } } : {}),
+    ...(from ? { orderDate: { gte: from } } : {}),
   });
 
-  const standardShippingRate = await prisma.shippingRate.findUnique({
-    where: { id: "standard" },
+  const standardShippingRate = await prisma.shippingRate.findFirst({
+    where: { pricingType: "PER_KG", isActive: true, price: { not: null } },
+    orderBy: { displayOrder: "asc" },
     select: { price: true },
   });
   const weightRate = standardShippingRate?.price ?? 0;
@@ -625,6 +654,7 @@ const clientSchema = z.object({
 
 export async function updateClient(id: string, data: unknown) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   const parsed = clientSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
 
@@ -656,6 +686,7 @@ export async function updateClient(id: string, data: unknown) {
 
 export async function deleteClient(id: string) {
   await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
   try {
     await prisma.client.delete({ where: { id } });
     revalidatePath("/admin/clients");
@@ -667,6 +698,7 @@ export async function deleteClient(id: string) {
 
 export async function adminGetOrder(id: string) {
   await requireViewer();
+  if (!isValidEntityId(id)) return null;
   return prisma.order.findUnique({
     where: { id },
     include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },
@@ -704,7 +736,7 @@ export async function adminGetMessages() {
 }
 
 export async function adminGetSettings() {
-  await requireViewer();
+  await requireSuperAdmin();
   const settings = await prisma.siteSetting.findMany();
   return Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
 }

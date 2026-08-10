@@ -21,7 +21,7 @@ const navItems = [
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
   { href: "/admin/utilisateurs", label: "Administrateurs", icon: UserCog, superAdminOnly: true },
-  { href: "/admin/parametres", label: "Paramètres", icon: Settings },
+  { href: "/admin/parametres", label: "Paramètres", icon: Settings, superAdminOnly: true },
 ];
 
 export function AdminSidebar({ role }: { role?: string }) {

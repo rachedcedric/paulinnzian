@@ -21,6 +21,10 @@ export async function consumeRateLimit(
 ) {
   const key = createHash("sha256").update(`${scope}:${identifier}`).digest("hex");
   const expiresAt = new Date(Date.now() + windowMs);
+  await prisma.$executeRaw`
+    DELETE FROM public_rate_limits
+    WHERE "expiresAt" <= NOW()
+  `;
   const rows = await prisma.$queryRaw<RateLimitRow[]>`
     INSERT INTO public_rate_limits ("key", "attempts", "expiresAt", "updatedAt")
     VALUES (${key}, 1, ${expiresAt}, NOW())
