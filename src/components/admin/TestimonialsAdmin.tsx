@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Star, X, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Star, X } from "lucide-react";
 import { createTestimonial, updateTestimonial, deleteTestimonial } from "@/actions/admin";
 import { testimonialSchema, type TestimonialFormData } from "@/lib/validations";
 import type { Testimonial } from "@/types";
@@ -14,7 +14,7 @@ export function TestimonialsAdmin({ initialData }: { initialData: Testimonial[] 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Testimonial | null>(null);
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<TestimonialFormData>({
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<TestimonialFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(testimonialSchema) as any,
   });
@@ -65,6 +65,8 @@ export function TestimonialsAdmin({ initialData }: { initialData: Testimonial[] 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div><label className="block text-sm font-semibold mb-1">Nom *</label>
                 <input {...register("name")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+              <div><label className="block text-sm font-semibold mb-1">Photo (URL)</label>
+                <input {...register("photo")} type="url" placeholder="https://..." className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
               <div><label className="block text-sm font-semibold mb-1">Note (1-5) *</label>
                 <input {...register("rating")} type="number" min={1} max={5} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
               <div><label className="block text-sm font-semibold mb-1">Commentaire *</label>

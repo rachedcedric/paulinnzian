@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSiteConfig } from "./SiteConfigContext";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
@@ -16,6 +17,7 @@ const navLinks = [
 ];
 
 export function Header() {
+  const { whatsappUrl } = useSiteConfig();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -54,7 +56,7 @@ export function Header() {
 
           {/* CTA Button */}
           <a
-            href="https://wa.me/33637036839"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:flex items-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all hover:shadow-lg"
@@ -90,7 +92,7 @@ export function Header() {
             ))}
             <div className="pt-2 px-4">
               <a
-                href="https://wa.me/33637036839"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 bg-[#25D366] text-white text-sm font-semibold px-5 py-3 rounded-full w-full"

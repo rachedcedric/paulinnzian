@@ -9,7 +9,7 @@ import { createOrder, updateOrder, deleteOrder, addTrackingEvent, deleteTracking
 import { orderSchema, trackingEventSchema, type OrderFormData, type TrackingEventFormData } from "@/lib/validations";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/types";
 import type { Order } from "@/types";
-import { formatDate, formatDateTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 const STATUS_OPTIONS = Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({ value, label }));
 
@@ -128,6 +128,12 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
                   <input {...register("customerEmail")} type="email" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Boutique</label>
                   <input {...register("storeName")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-semibold mb-1">Numéro commande boutique</label>
+                  <input {...register("storeOrderNumber")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                <div><label className="block text-xs font-semibold mb-1">Date de commande</label>
+                  <input {...register("orderDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Montant (FCFA)</label>

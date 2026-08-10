@@ -34,13 +34,15 @@ enum MessageStatus {
 }
 
 model AdminUser {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  password            String
+  name                String
+  role                Role      @default(ADMIN)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@map("admin_users")
 }
@@ -188,4 +190,14 @@ model SiteSetting {
   createdAt DateTime @default(now())
 
   @@map("site_settings")
+}
+
+model PublicRateLimit {
+  key       String   @id
+  attempts  Int      @default(1)
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+  @@map("public_rate_limits")
 }

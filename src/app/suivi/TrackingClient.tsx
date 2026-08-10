@@ -27,15 +27,6 @@ type TrackingOrder = {
   }[];
 };
 
-const STATUS_ORDER: OrderStatus[] = [
-  "PENDING",
-  "PURCHASED",
-  "RECEIVED_PARIS",
-  "SHIPPED_DESTINATION",
-  "ARRIVED_DESTINATION",
-  "DELIVERED",
-];
-
 export function TrackingClient() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,10 +49,6 @@ export function TrackingClient() {
       setError(result.error || "Erreur inconnue");
     }
   }
-
-  const currentStatusIndex = order
-    ? STATUS_ORDER.indexOf(order.status)
-    : -1;
 
   return (
     <div className="pt-20 min-h-screen bg-white">

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Testimonial } from "@/types";
+import Image from "next/image";
 
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];
@@ -61,9 +62,20 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
 
               {/* Author */}
               <div className="flex items-center justify-center gap-3">
-                <div className="w-12 h-12 bg-[#FF6500] rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  {testimonials[current].name.charAt(0)}
-                </div>
+                {testimonials[current].photo ? (
+                  <Image
+                    src={testimonials[current].photo}
+                    alt={testimonials[current].name}
+                    width={48}
+                    height={48}
+                    unoptimized
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-[#FF6500] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {testimonials[current].name.charAt(0)}
+                  </div>
+                )}
                 <div className="text-left">
                   <p className="font-bold text-black">{testimonials[current].name}</p>
                   <p className="text-sm text-gray-500">Client vérifié</p>

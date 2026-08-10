@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { FloatingButtons } from "@/components/layout/FloatingButtons";
 import { Toaster } from "sonner";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { MarketingTracking } from "@/components/analytics/MarketingTracking";
@@ -62,9 +59,21 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
 
   return (
-    <html lang="fr" className={`${inter.variable} h-full antialiased`}>
+    <html lang="fr" className={`${inter.variable} h-full antialiased`} data-scroll-behavior="smooth">
       <body className="min-h-full flex flex-col font-sans">
-        <LayoutWrapper>
+        <LayoutWrapper
+          facebookUrl={settings.facebook_url || "https://www.facebook.com/profile.php?id=61570727913162"}
+          instagramUrl={settings.instagram_url || "https://www.instagram.com/paulinnzianofficiel"}
+          whatsappUrl={settings.whatsapp_link || "https://wa.me/33637036839"}
+          whatsappNumber={settings.whatsapp_number || "+33 6 37 03 68 39"}
+          phoneCi={settings.phone_ci || "+225 07 77 06 13 30"}
+          addressParis={settings.address_paris || "Paris 18ème arrondissement"}
+          addressAbidjan={settings.address_abidjan || "Cocody Faya, Abidjan"}
+          siteName={settings.site_name || "Paulin N'ZIAN"}
+          siteSlogan={settings.site_slogan || "Votre Personal Shopper pour vos achats en Europe."}
+          heroTitle={settings.hero_title || ""}
+          heroSubtitle={settings.hero_subtitle || ""}
+        >
           {children}
         </LayoutWrapper>
         <Toaster richColors position="top-right" />

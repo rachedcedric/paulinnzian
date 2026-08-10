@@ -12,11 +12,63 @@ import {
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import {
+  hasAdminRole,
+  MANAGER_ROLES,
+  SUPER_ADMIN_ROLES,
+  VIEWER_ROLES,
+  type AdminRole,
+} from "@/lib/admin-permissions";
 
-async function requireAuth() {
+async function requireRole(allowedRoles: readonly AdminRole[]) {
   const session = await auth();
-  if (!session?.user) throw new Error("Non autorisé");
+  if (!session?.user?.id) throw new Error("Non autorisé");
+
+  const user = await prisma.adminUser.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
+  if (!user || !hasAdminRole(user.role, allowedRoles)) throw new Error("Accès interdit");
   return session;
+}
+
+const requireViewer = () => requireRole(VIEWER_ROLES);
+const requireManager = () => requireRole(MANAGER_ROLES);
+const requireSuperAdmin = () => requireRole(SUPER_ADMIN_ROLES);
+
+const SITE_SETTING_KEYS = new Set([
+  "site_name", "site_slogan", "whatsapp_number", "whatsapp_link", "phone_ci",
+  "address_paris", "address_abidjan", "facebook_url", "instagram_url", "hero_title",
+  "hero_subtitle", "meta_description", "facebook_pixel_id", "google_ads_id",
+  "google_analytics_id", "tiktok_pixel_id",
+]);
+const SETTING_URL_HOSTS: Record<string, readonly string[]> = {
+  whatsapp_link: ["wa.me", "api.whatsapp.com"],
+  facebook_url: ["facebook.com", "www.facebook.com"],
+  instagram_url: ["instagram.com", "www.instagram.com"],
+};
+
+function validateSiteSettings(data: unknown) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  const entries = Object.entries(data);
+  if (entries.length > SITE_SETTING_KEYS.size) return null;
+
+  const settings: Record<string, string> = {};
+  for (const [key, rawValue] of entries) {
+    if (!SITE_SETTING_KEYS.has(key) || typeof rawValue !== "string" || rawValue.length > 1_000) return null;
+    const value = rawValue.trim();
+    const allowedHosts = SETTING_URL_HOSTS[key];
+    if (value && allowedHosts) {
+      try {
+        const url = new URL(value);
+        if (url.protocol !== "https:" || !allowedHosts.includes(url.hostname)) return null;
+      } catch {
+        return null;
+      }
+    }
+    settings[key] = value;
+  }
+  return settings;
 }
 
 function normalizePhone(phone: string) {
@@ -25,7 +77,7 @@ function normalizePhone(phone: string) {
 
 // ─── STORES ───────────────────────────────────────────────────────────────────
 export async function createStore(data: unknown) {
-  await requireAuth();
+  await requireManager();
   const parsed = storeSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -40,7 +92,7 @@ export async function createStore(data: unknown) {
 }
 
 export async function updateStore(id: string, data: unknown) {
-  await requireAuth();
+  await requireManager();
   const parsed = storeSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -55,7 +107,7 @@ export async function updateStore(id: string, data: unknown) {
 }
 
 export async function deleteStore(id: string) {
-  await requireAuth();
+  await requireManager();
   await prisma.store.delete({ where: { id } });
   revalidatePath("/boutiques");
   revalidatePath("/admin/boutiques");
@@ -63,7 +115,7 @@ export async function deleteStore(id: string) {
 }
 
 export async function toggleStoreActive(id: string, isActive: boolean) {
-  await requireAuth();
+  await requireManager();
   await prisma.store.update({ where: { id }, data: { isActive } });
   revalidatePath("/boutiques");
   revalidatePath("/admin/boutiques");
@@ -72,7 +124,7 @@ export async function toggleStoreActive(id: string, isActive: boolean) {
 
 // ─── EXCHANGE RATES ───────────────────────────────────────────────────────────
 export async function updateExchangeRate(id: string, rate: number, description?: string) {
-  await requireAuth();
+  await requireSuperAdmin();
   await prisma.exchangeRate.update({
     where: { id },
     data: { rate, ...(description ? { description } : {}), updatedAt: new Date() },
@@ -87,7 +139,7 @@ export async function updateShippingRate(
   id: string,
   data: { price?: number; percentage?: number; estimatedDelivery?: string; description?: string }
 ) {
-  await requireAuth();
+  await requireSuperAdmin();
   await prisma.shippingRate.update({ where: { id }, data });
   revalidatePath("/tarifs");
   revalidatePath("/admin/tarifs");
@@ -96,7 +148,7 @@ export async function updateShippingRate(
 
 // ─── ORDERS ───────────────────────────────────────────────────────────────────
 export async function createOrder(data: unknown) {
-  await requireAuth();
+  await requireManager();
   const parsed = orderSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides", details: parsed.error.flatten() };
 
@@ -141,7 +193,7 @@ export async function createOrder(data: unknown) {
 }
 
 export async function updateOrder(id: string, data: unknown) {
-  await requireAuth();
+  await requireManager();
   const parsed = orderSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -182,14 +234,14 @@ export async function updateOrder(id: string, data: unknown) {
 }
 
 export async function deleteOrder(id: string) {
-  await requireAuth();
+  await requireManager();
   await prisma.order.delete({ where: { id } });
   revalidatePath("/admin/commandes");
   return { success: true };
 }
 
 export async function addTrackingEvent(data: unknown) {
-  await requireAuth();
+  await requireManager();
   const parsed = trackingEventSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -214,15 +266,30 @@ export async function addTrackingEvent(data: unknown) {
 }
 
 export async function deleteTrackingEvent(id: string) {
-  await requireAuth();
-  await prisma.trackingEvent.delete({ where: { id } });
+  await requireManager();
+  await prisma.$transaction(async (transaction) => {
+    const event = await transaction.trackingEvent.delete({
+      where: { id },
+      select: { orderId: true },
+    });
+    const latestEvent = await transaction.trackingEvent.findFirst({
+      where: { orderId: event.orderId },
+      orderBy: [{ eventDate: "desc" }, { createdAt: "desc" }],
+      select: { status: true },
+    });
+    await transaction.order.update({
+      where: { id: event.orderId },
+      data: { status: latestEvent?.status ?? "PENDING" },
+    });
+  });
+  revalidatePath("/suivi");
   revalidatePath("/admin/commandes");
   return { success: true };
 }
 
 // ─── TESTIMONIALS ─────────────────────────────────────────────────────────────
 export async function createTestimonial(data: unknown) {
-  await requireAuth();
+  await requireViewer();
   const parsed = testimonialSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -233,7 +300,7 @@ export async function createTestimonial(data: unknown) {
 }
 
 export async function updateTestimonial(id: string, data: unknown) {
-  await requireAuth();
+  await requireViewer();
   const parsed = testimonialSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -244,7 +311,7 @@ export async function updateTestimonial(id: string, data: unknown) {
 }
 
 export async function deleteTestimonial(id: string) {
-  await requireAuth();
+  await requireViewer();
   await prisma.testimonial.delete({ where: { id } });
   revalidatePath("/");
   revalidatePath("/admin/temoignages");
@@ -253,7 +320,7 @@ export async function deleteTestimonial(id: string) {
 
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
 export async function createFAQ(data: unknown) {
-  await requireAuth();
+  await requireViewer();
   const parsed = faqSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -264,7 +331,7 @@ export async function createFAQ(data: unknown) {
 }
 
 export async function updateFAQ(id: string, data: unknown) {
-  await requireAuth();
+  await requireViewer();
   const parsed = faqSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
@@ -275,7 +342,7 @@ export async function updateFAQ(id: string, data: unknown) {
 }
 
 export async function deleteFAQ(id: string) {
-  await requireAuth();
+  await requireViewer();
   await prisma.fAQ.delete({ where: { id } });
   revalidatePath("/");
   revalidatePath("/admin/faq");
@@ -284,14 +351,14 @@ export async function deleteFAQ(id: string) {
 
 // ─── MESSAGES ─────────────────────────────────────────────────────────────────
 export async function markMessageRead(id: string) {
-  await requireAuth();
+  await requireManager();
   await prisma.contactMessage.update({ where: { id }, data: { status: "READ" } });
   revalidatePath("/admin/messages");
   return { success: true };
 }
 
 export async function deleteMessage(id: string) {
-  await requireAuth();
+  await requireManager();
   await prisma.contactMessage.delete({ where: { id } });
   revalidatePath("/admin/messages");
   return { success: true };
@@ -299,9 +366,11 @@ export async function deleteMessage(id: string) {
 
 // ─── SITE SETTINGS ────────────────────────────────────────────────────────────
 export async function updateSiteSettings(data: Record<string, string>) {
-  await requireAuth();
+  await requireSuperAdmin();
+  const settings = validateSiteSettings(data);
+  if (!settings) return { success: false, error: "Paramètres invalides" };
 
-  for (const [key, value] of Object.entries(data)) {
+  for (const [key, value] of Object.entries(settings)) {
     await prisma.siteSetting.upsert({
       where: { key },
       update: { value },
@@ -314,24 +383,95 @@ export async function updateSiteSettings(data: Record<string, string>) {
 }
 
 // ─── ADMIN USERS ──────────────────────────────────────────────────────────────
+const adminUserInputSchema = z.object({
+  email: z.string().trim().toLowerCase().email().max(254),
+  password: z.string().min(12).max(128),
+  name: z.string().trim().min(2).max(100),
+  role: z.enum(["SUPER_ADMIN", "ADMIN", "EDITOR"]),
+});
+
 export async function createAdminUser(data: { email: string; password: string; name: string; role: "SUPER_ADMIN" | "ADMIN" | "EDITOR" }) {
-  await requireAuth();
-  const hashedPassword = await bcrypt.hash(data.password, 12);
+  await requireSuperAdmin();
+  const parsed = adminUserInputSchema.safeParse(data);
+  if (!parsed.success) return { success: false, error: "Données invalides" };
+  const hashedPassword = await bcrypt.hash(parsed.data.password, 12);
 
   try {
     const user = await prisma.adminUser.create({
-      data: { ...data, password: hashedPassword },
+      data: { ...parsed.data, password: hashedPassword },
       select: { id: true, email: true, name: true, role: true },
     });
+    revalidatePath("/admin/utilisateurs");
     return { success: true, user };
   } catch {
     return { success: false, error: "Cet email est déjà utilisé" };
   }
 }
 
+export async function adminGetUsers() {
+  await requireSuperAdmin();
+  return prisma.adminUser.findMany({
+    orderBy: { createdAt: "asc" },
+    select: { id: true, email: true, name: true, role: true, createdAt: true },
+  });
+}
+
+export async function updateAdminUser(
+  id: string,
+  data: { name: string; role: AdminRole; password?: string },
+) {
+  const session = await requireSuperAdmin();
+  const parsed = z.object({
+    name: z.string().trim().min(2).max(100),
+    role: z.enum(["SUPER_ADMIN", "ADMIN", "EDITOR"]),
+    password: z.string().min(12).max(128).optional().or(z.literal("")),
+  }).safeParse(data);
+  if (!parsed.success) return { success: false, error: "Données invalides" };
+
+  const target = await prisma.adminUser.findUnique({ where: { id }, select: { role: true } });
+  if (!target) return { success: false, error: "Compte introuvable" };
+  if (session.user?.id === id && parsed.data.role !== "SUPER_ADMIN") {
+    return { success: false, error: "Vous ne pouvez pas retirer votre propre rôle SUPER_ADMIN" };
+  }
+  if (target.role === "SUPER_ADMIN" && parsed.data.role !== "SUPER_ADMIN") {
+    const superAdminCount = await prisma.adminUser.count({ where: { role: "SUPER_ADMIN" } });
+    if (superAdminCount <= 1) return { success: false, error: "Un SUPER_ADMIN doit être conservé" };
+  }
+
+  const user = await prisma.adminUser.update({
+    where: { id },
+    data: {
+      name: parsed.data.name,
+      role: parsed.data.role,
+      ...(parsed.data.password ? { password: await bcrypt.hash(parsed.data.password, 12) } : {}),
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+    },
+    select: { id: true, email: true, name: true, role: true, createdAt: true },
+  });
+  revalidatePath("/admin/utilisateurs");
+  return { success: true, user };
+}
+
+export async function deleteAdminUser(id: string) {
+  const session = await requireSuperAdmin();
+  if (session.user?.id === id) return { success: false, error: "Vous ne pouvez pas supprimer votre propre compte" };
+
+  const target = await prisma.adminUser.findUnique({ where: { id }, select: { role: true } });
+  if (!target) return { success: false, error: "Compte introuvable" };
+  if (target.role === "SUPER_ADMIN") {
+    const superAdminCount = await prisma.adminUser.count({ where: { role: "SUPER_ADMIN" } });
+    if (superAdminCount <= 1) return { success: false, error: "Un SUPER_ADMIN doit être conservé" };
+  }
+
+  await prisma.adminUser.delete({ where: { id } });
+  revalidatePath("/admin/utilisateurs");
+  return { success: true };
+}
+
 // ─── DASHBOARD STATS ──────────────────────────────────────────────────────────
 export async function getDashboardStats() {
-  await requireAuth();
+  await requireViewer();
 
   const now = new Date();
   const startOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -351,9 +491,14 @@ export async function getDashboardStats() {
     ...(from ? { createdAt: { gte: from } } : {}),
   });
 
-  // ceil(weight) × 9800 — toute fraction de kg compte comme 1 kg
+  const standardShippingRate = await prisma.shippingRate.findUnique({
+    where: { id: "standard" },
+    select: { price: true },
+  });
+  const weightRate = standardShippingRate?.price ?? 0;
+
   const sumWeight = (rows: { weight: number | null }[]) =>
-    rows.reduce((s, o) => s + (o.weight ? Math.ceil(o.weight) * 9800 : 0), 0);
+    rows.reduce((sum, order) => sum + (order.weight ? Math.ceil(order.weight) * weightRate : 0), 0);
 
   const sumAmount = (r: { _sum: { amount: number | null } }) => r._sum.amount ?? 0;
 
@@ -381,7 +526,7 @@ export async function getDashboardStats() {
     prisma.order.findMany({ where: weightWhere(startOfYear),    select: { weight: true } }).then(sumWeight),
   ]);
 
-  const weightRevenue      = { total: wAll, day: wDay, week: wWeek, month: wMonth, year: wYear };
+  const weightRevenue = { total: wAll, day: wDay, week: wWeek, month: wMonth, year: wYear, rate: weightRate };
 
   const recentOrders = await prisma.order.findMany({
     take: 5,
@@ -426,7 +571,7 @@ export async function adminGetOrders(filters?: {
   status?: string;
   destination?: string;
 }) {
-  await requireAuth();
+  await requireViewer();
   return prisma.order.findMany({
     where: {
       ...(filters?.search
@@ -448,7 +593,7 @@ export async function adminGetOrders(filters?: {
 }
 
 export async function adminGetClients() {
-  await requireAuth();
+  await requireViewer();
 
   const [clients, orderCounts] = await Promise.all([
     prisma.client.findMany({ orderBy: { name: "asc" } }),
@@ -479,7 +624,7 @@ const clientSchema = z.object({
 });
 
 export async function updateClient(id: string, data: unknown) {
-  await requireAuth();
+  await requireManager();
   const parsed = clientSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
 
@@ -510,7 +655,7 @@ export async function updateClient(id: string, data: unknown) {
 }
 
 export async function deleteClient(id: string) {
-  await requireAuth();
+  await requireManager();
   try {
     await prisma.client.delete({ where: { id } });
     revalidatePath("/admin/clients");
@@ -521,7 +666,7 @@ export async function deleteClient(id: string) {
 }
 
 export async function adminGetOrder(id: string) {
-  await requireAuth();
+  await requireViewer();
   return prisma.order.findUnique({
     where: { id },
     include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },
@@ -529,37 +674,37 @@ export async function adminGetOrder(id: string) {
 }
 
 export async function adminGetStores() {
-  await requireAuth();
+  await requireViewer();
   return prisma.store.findMany({ orderBy: { displayOrder: "asc" } });
 }
 
 export async function adminGetExchangeRates() {
-  await requireAuth();
+  await requireViewer();
   return prisma.exchangeRate.findMany({ orderBy: { createdAt: "asc" } });
 }
 
 export async function adminGetShippingRates() {
-  await requireAuth();
+  await requireViewer();
   return prisma.shippingRate.findMany({ orderBy: { displayOrder: "asc" } });
 }
 
 export async function adminGetTestimonials() {
-  await requireAuth();
+  await requireViewer();
   return prisma.testimonial.findMany({ orderBy: { displayOrder: "asc" } });
 }
 
 export async function adminGetFAQs() {
-  await requireAuth();
+  await requireViewer();
   return prisma.fAQ.findMany({ orderBy: { displayOrder: "asc" } });
 }
 
 export async function adminGetMessages() {
-  await requireAuth();
+  await requireViewer();
   return prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" } });
 }
 
 export async function adminGetSettings() {
-  await requireAuth();
+  await requireViewer();
   const settings = await prisma.siteSetting.findMany();
   return Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
 }

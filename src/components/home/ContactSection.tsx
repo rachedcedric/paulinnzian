@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import { MapPin, MessageCircle, Phone } from "lucide-react";
 import { ContactForm } from "@/components/ui/ContactForm";
+import { useSiteConfig } from "@/components/layout/SiteConfigContext";
 
 export function ContactSection() {
+  const { whatsappUrl, whatsappNumber, phoneCi, addressParis, addressAbidjan, siteName } = useSiteConfig();
   return (
     <section className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,13 +25,13 @@ export function ContactSection() {
         <div className="grid lg:grid-cols-2 gap-10">
           {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="bg-black rounded-3xl p-8 lg:p-10 text-white"
           >
             <div className="mb-8">
-              <h3 className="text-2xl font-black text-white mb-1">Paulin N'ZIAN</h3>
+              <h3 className="text-2xl font-black text-white mb-1">{siteName}</h3>
               <p className="text-[#FF6500] font-semibold">Personal Shopper</p>
             </div>
 
@@ -40,7 +42,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Paris</p>
-                  <p className="text-white font-semibold">Paris 18ème arrondissement</p>
+                  <p className="text-white font-semibold">{addressParis}</p>
                 </div>
               </div>
 
@@ -50,7 +52,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Abidjan</p>
-                  <p className="text-white font-semibold">Cocody Faya, Abidjan</p>
+                  <p className="text-white font-semibold">{addressAbidjan}</p>
                 </div>
               </div>
 
@@ -60,8 +62,8 @@ export function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">WhatsApp</p>
-                  <a href="https://wa.me/33637036839" className="text-[#25D366] font-semibold hover:underline">
-                    +33 6 37 03 68 39
+                  <a href={whatsappUrl} className="text-[#25D366] font-semibold hover:underline">
+                    {whatsappNumber}
                   </a>
                 </div>
               </div>
@@ -72,14 +74,14 @@ export function ContactSection() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Appels & SMS CI</p>
-                  <p className="text-white font-semibold">+225 07 77 06 13 30</p>
+                  <p className="text-white font-semibold">{phoneCi}</p>
                 </div>
               </div>
             </div>
 
             <div className="mt-8">
               <a
-                href="https://wa.me/33637036839"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white font-bold py-4 rounded-2xl transition-all"
@@ -92,8 +94,8 @@ export function ContactSection() {
 
           {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             <ContactForm />

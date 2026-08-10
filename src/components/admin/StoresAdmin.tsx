@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, X, Upload } from "lucide-react";
@@ -21,13 +21,13 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     formState: { errors, isSubmitting },
     setValue,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = useForm<StoreFormData>({ resolver: zodResolver(storeSchema) as any });
 
-  const logoValue = watch("logo");
+  const logoValue = useWatch({ control, name: "logo" });
 
   function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

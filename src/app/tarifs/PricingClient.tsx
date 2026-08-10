@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Package, Star, Cpu } from "lucide-react";
 import type { ExchangeRate, ShippingRate } from "@/types";
-import Link from "next/link";
+import { useSiteConfig } from "@/components/layout/SiteConfigContext";
 
 const shippingIcons = [Package, Zap, Star, Cpu];
 
@@ -14,6 +14,7 @@ export function PricingClient({
   exchangeRates: ExchangeRate[];
   shippingRates: ShippingRate[];
 }) {
+  const { whatsappUrl } = useSiteConfig();
   return (
     <div className="pt-20 min-h-screen bg-white">
       {/* Header */}
@@ -148,7 +149,7 @@ export function PricingClient({
             Envoyez vos liens produits et obtenez un devis immédiat.
           </p>
           <a
-            href="https://wa.me/33637036839"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-[#FF6500] font-bold px-8 py-4 rounded-full hover:shadow-lg transition-all"

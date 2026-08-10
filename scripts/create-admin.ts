@@ -31,8 +31,8 @@ async function createAdmin() {
     console.log(`   Mot de passe: ${password}`);
     console.log(`   Nom: ${name}`);
     console.log(`   ID: ${user.id}`);
-  } catch (error: any) {
-    console.error("❌ Erreur:", error.message);
+  } catch (error: unknown) {
+    console.error("❌ Erreur:", error instanceof Error ? error.message : "Erreur inconnue");
   } finally {
     await prisma.$disconnect();
   }

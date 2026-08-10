@@ -6,8 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
 import { useState } from "react";
 import { ShoppingBag, Eye, EyeOff, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,8 @@ export default function AdminLoginPage() {
     if (result?.error) {
       setError("Email ou mot de passe incorrect");
     } else {
-      window.location.href = "/admin";
+      router.replace("/admin");
+      router.refresh();
     }
   }
 

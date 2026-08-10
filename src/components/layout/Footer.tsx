@@ -1,12 +1,28 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MessageCircle } from "lucide-react";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { useSiteConfig } from "./SiteConfigContext";
 
-export function Footer() {
+interface FooterProps {
+  facebookUrl: string;
+  instagramUrl: string;
+}
+
+export function Footer({ facebookUrl, instagramUrl }: FooterProps) {
+  const {
+    whatsappUrl,
+    whatsappNumber,
+    phoneCi,
+    addressParis,
+    addressAbidjan,
+    siteName,
+    siteSlogan,
+  } = useSiteConfig();
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-black text-white pt-16 pb-8">
+    <footer className="bg-black text-white pt-16 pb-44 sm:pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
@@ -15,11 +31,11 @@ export function Footer() {
               <Image src="/logo.png" alt="MR SHEIN" width={56} height={56} className="rounded-full" />
             </div>
             <p className="text-sm text-gray-400 mb-4">
-              Paulin N'ZIAN — Votre Personal Shopper pour vos achats en Europe.
+              {siteName} — {siteSlogan}
             </p>
             <div className="flex gap-3">
               <a
-                href="https://wa.me/33637036839"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
@@ -28,18 +44,24 @@ export function Footer() {
                 <MessageCircle className="w-4 h-4 text-white" />
               </a>
               <a
-                href="#"
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6500] transition-colors"
+                title="Instagram"
+                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#E4405F] transition-colors"
               >
-                <span className="text-white text-xs font-bold">IG</span>
+                <FaInstagram className="w-4 h-4 text-white" />
               </a>
               <a
-                href="#"
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6500] transition-colors"
+                title="Facebook"
+                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#1877F2] transition-colors"
               >
-                <span className="text-white text-xs font-bold">FB</span>
+                <FaFacebookF className="w-4 h-4 text-white" />
               </a>
             </div>
           </div>
@@ -74,21 +96,21 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-gray-400">
               <li>
                 <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Bureau Paris</p>
-                <p>Paris 18ème arrondissement</p>
+                <p>{addressParis}</p>
               </li>
               <li>
                 <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Bureau Abidjan</p>
-                <p>Cocody Faya, Abidjan</p>
+                <p>{addressAbidjan}</p>
               </li>
               <li>
                 <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">WhatsApp</p>
-                <a href="https://wa.me/33637036839" className="hover:text-[#25D366] transition-colors">
-                  +33 6 37 03 68 39
+                <a href={whatsappUrl} className="hover:text-[#25D366] transition-colors">
+                  {whatsappNumber}
                 </a>
               </li>
               <li>
                 <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Appels & SMS</p>
-                <p>+225 07 77 06 13 30</p>
+                <p>{phoneCi}</p>
               </li>
             </ul>
           </div>
@@ -100,7 +122,7 @@ export function Footer() {
               Envoyez-moi vos liens produits directement sur WhatsApp.
             </p>
             <a
-              href="https://wa.me/33637036839"
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white text-sm font-semibold px-5 py-3 rounded-full transition-all"

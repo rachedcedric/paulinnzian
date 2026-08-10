@@ -22,8 +22,8 @@ export function ComparisonSection() {
         <div className="grid md:grid-cols-3 gap-6 items-center">
           {/* Others */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="bg-white rounded-2xl p-7 border-2 border-gray-200"
           >
@@ -58,8 +58,8 @@ export function ComparisonSection() {
 
           {/* Us */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="bg-black rounded-2xl p-7 border-2 border-[#FF6500]"
           >

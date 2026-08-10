@@ -2,7 +2,7 @@ import { getDashboardStats } from "@/actions/admin";
 import { RevenueWidget } from "@/components/admin/RevenueWidget";
 import { WeightRevenueWidget } from "@/components/admin/WeightRevenueWidget";
 import {
-  Package, Store, MessageSquare, Star, TrendingUp, Clock,
+  Package, Store, MessageSquare, Star, TrendingUp,
 } from "lucide-react";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/types";
 import { formatDate } from "@/lib/utils";

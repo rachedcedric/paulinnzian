@@ -29,8 +29,7 @@ export function encodeWhatsAppMessage(message: string): string {
   return encodeURIComponent(message);
 }
 
-export function getWhatsAppLink(message?: string): string {
-  const base = "https://wa.me/33637036839";
+export function getWhatsAppLink(base: string, message?: string): string {
   if (!message) return base;
   return `${base}?text=${encodeWhatsAppMessage(message)}`;
 }

@@ -14,7 +14,7 @@ export function FAQAdmin({ initialData }: { initialData: FAQ[] }) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<FAQ | null>(null);
 
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FAQFormData>({
+  const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<FAQFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(faqSchema) as any,
   });

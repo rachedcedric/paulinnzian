@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { MapPin, MessageCircle, Phone } from "lucide-react";
 import { ContactForm } from "@/components/ui/ContactForm";
+import { getSiteSettings } from "@/actions/public";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Contactez Paulin N'ZIAN, votre Personal Shopper.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
+  const whatsappUrl = settings.whatsapp_link || "https://wa.me/33637036839";
   return (
     <div className="pt-20 min-h-screen bg-white">
       {/* Header */}
@@ -27,7 +32,7 @@ export default function ContactPage() {
           {/* Contact Info Card */}
           <div className="bg-black rounded-3xl p-8 lg:p-10 text-white">
             <div className="mb-8">
-              <h2 className="text-2xl font-black text-white mb-1">Paulin N'ZIAN</h2>
+              <h2 className="text-2xl font-black text-white mb-1">{settings.site_name || "Paulin N'ZIAN"}</h2>
               <p className="text-[#FF6500] font-semibold">Personal Shopper</p>
             </div>
 
@@ -38,7 +43,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Paris</p>
-                  <p className="text-white font-semibold">Paris 18ème arrondissement</p>
+                  <p className="text-white font-semibold">{settings.address_paris || "Paris 18ème arrondissement"}</p>
                 </div>
               </div>
 
@@ -48,7 +53,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Abidjan</p>
-                  <p className="text-white font-semibold">Cocody Faya, Abidjan</p>
+                  <p className="text-white font-semibold">{settings.address_abidjan || "Cocody Faya, Abidjan"}</p>
                 </div>
               </div>
 
@@ -59,10 +64,10 @@ export default function ContactPage() {
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">WhatsApp</p>
                   <a
-                    href="https://wa.me/33637036839"
+                    href={whatsappUrl}
                     className="text-[#25D366] font-semibold hover:underline text-lg"
                   >
-                    +33 6 37 03 68 39
+                    {settings.whatsapp_number || "+33 6 37 03 68 39"}
                   </a>
                 </div>
               </div>
@@ -73,14 +78,14 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Appels & SMS CI</p>
-                  <p className="text-white font-semibold text-lg">+225 07 77 06 13 30</p>
+                  <p className="text-white font-semibold text-lg">{settings.phone_ci || "+225 07 77 06 13 30"}</p>
                 </div>
               </div>
             </div>
 
             <div className="mt-8 space-y-3">
               <a
-                href="https://wa.me/33637036839"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white font-bold py-4 rounded-2xl transition-all"

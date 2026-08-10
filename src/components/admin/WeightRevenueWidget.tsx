@@ -13,7 +13,7 @@ const PERIODS: { key: Period; label: string }[] = [
 ];
 
 interface Props {
-  weightRevenue: { total: number; day: number; week: number; month: number; year: number };
+  weightRevenue: { total: number; day: number; week: number; month: number; year: number; rate: number };
 }
 
 function fmt(n: number) {
@@ -37,7 +37,9 @@ export function WeightRevenueWidget({ weightRevenue }: Props) {
           <Scale className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-xs text-gray-500">Frais transport total <span className="text-gray-400">(9 800 F CFA/kg)</span></p>
+          <p className="text-xs text-gray-500">
+            Frais transport total <span className="text-gray-400">({fmt(weightRevenue.rate)}/kg)</span>
+          </p>
           <p className="text-2xl font-black text-black">{fmt(weightRevenue.total)}</p>
         </div>
       </div>

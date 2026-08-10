@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { motion } from "framer-motion";
 import {
   Link, Calculator, CreditCard, ShoppingCart, Package, Plane, CheckCircle, Store, Smartphone,
 } from "lucide-react";
+import { getSiteSettings } from "@/actions/public";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Comment ça marche",
@@ -60,7 +62,10 @@ const steps = [
   },
 ];
 
-export default function CommentCaMarchePage() {
+export default async function CommentCaMarchePage() {
+  const settings = await getSiteSettings();
+  const whatsappUrl = settings.whatsapp_link || "https://wa.me/33637036839";
+  const storeRequestUrl = `${whatsappUrl}${whatsappUrl.includes("?") ? "&" : "?"}text=${encodeURIComponent("Bonjour Paulin, je souhaite effectuer un achat directement en magasin.")}`;
   return (
     <div className="pt-20 min-h-screen bg-white">
       {/* Header */}
@@ -138,7 +143,7 @@ export default function CommentCaMarchePage() {
             </div>
           </div>
           <a
-            href={`https://wa.me/33637036839?text=${encodeURIComponent("Bonjour Paulin, je souhaite effectuer un achat directement en magasin.")}`}
+            href={storeRequestUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#FF6500] hover:bg-[#e55a00] text-white font-bold px-8 py-4 rounded-full transition-all"
@@ -150,7 +155,7 @@ export default function CommentCaMarchePage() {
         {/* CTA */}
         <div className="text-center">
           <a
-            href="https://wa.me/33637036839"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white font-bold px-12 py-5 rounded-full text-lg transition-all hover:shadow-lg"

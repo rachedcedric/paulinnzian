@@ -2,9 +2,16 @@
 
 import { prisma } from "@/lib/db";
 import { contactSchema } from "@/lib/validations";
+import { consumeRateLimit, getRequestFingerprint } from "@/lib/rate-limit";
 import { revalidatePath } from "next/cache";
 
 export async function submitContactForm(formData: unknown) {
+  const fingerprint = await getRequestFingerprint();
+  const rateLimit = await consumeRateLimit("contact", fingerprint, 3, 10 * 60 * 1000);
+  if (!rateLimit.allowed) {
+    return { success: false, error: "Trop de messages envoyés. Réessayez dans quelques minutes." };
+  }
+
   const parsed = contactSchema.safeParse(formData);
   if (!parsed.success) {
     return { success: false, error: "Données invalides" };
@@ -97,30 +104,20 @@ export async function getSiteSettings() {
   }
 }
 
-// Rate-limited tracking lookup
-const trackingAttempts = new Map<string, { count: number; resetAt: number }>();
-
 export async function trackOrder(trackingNumber: string) {
   if (!trackingNumber || trackingNumber.length < 3) {
     return { success: false, error: "Numéro de suivi invalide" };
   }
 
-  // Simple in-memory rate limiting (5 attempts per 10 minutes per tracking number)
   const key = trackingNumber.trim().toUpperCase();
-  const now = Date.now();
-  const attempt = trackingAttempts.get(key);
+  const fingerprint = await getRequestFingerprint();
+  const [visitorLimit, lookupLimit] = await Promise.all([
+    consumeRateLimit("tracking-visitor", fingerprint, 10, 10 * 60 * 1000),
+    consumeRateLimit("tracking-lookup", `${fingerprint}:${key}`, 5, 10 * 60 * 1000),
+  ]);
 
-  if (attempt) {
-    if (now < attempt.resetAt) {
-      if (attempt.count >= 5) {
-        return { success: false, error: "Trop de tentatives. Réessayez dans quelques minutes." };
-      }
-      attempt.count++;
-    } else {
-      trackingAttempts.set(key, { count: 1, resetAt: now + 10 * 60 * 1000 });
-    }
-  } else {
-    trackingAttempts.set(key, { count: 1, resetAt: now + 10 * 60 * 1000 });
+  if (!visitorLimit.allowed || !lookupLimit.allowed) {
+    return { success: false, error: "Trop de tentatives. Réessayez dans quelques minutes." };
   }
 
   const order = await prisma.order.findUnique({

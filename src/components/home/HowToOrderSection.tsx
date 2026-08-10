@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
   Link as LinkIcon, Calculator, CreditCard, ShoppingCart, Package, Plane, CheckCircle,
 } from "lucide-react";
+import { useSiteConfig } from "@/components/layout/SiteConfigContext";
 
 const steps = [
   { icon: LinkIcon, number: "01", title: "Envoyez le lien", description: "Envoyez le lien du produit ou votre panier via WhatsApp." },
@@ -16,6 +17,7 @@ const steps = [
 ];
 
 export function HowToOrderSection() {
+  const { whatsappUrl } = useSiteConfig();
   return (
     <section className="py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,8 +67,8 @@ export function HowToOrderSection() {
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               className="flex gap-4"
@@ -96,7 +98,7 @@ export function HowToOrderSection() {
           className="text-center mt-12"
         >
           <a
-            href="https://wa.me/33637036839"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white font-bold px-10 py-4 rounded-full text-base transition-all hover:shadow-lg"

@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, Store, DollarSign, Star, HelpCircle,
   MessageSquare, Settings, LogOut, ShoppingBag, Menu, X, Users,
+  UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -19,10 +20,11 @@ const navItems = [
   { href: "/admin/temoignages", label: "Témoignages", icon: Star },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+  { href: "/admin/utilisateurs", label: "Administrateurs", icon: UserCog, superAdminOnly: true },
   { href: "/admin/parametres", label: "Paramètres", icon: Settings },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ role }: { role?: string }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -76,6 +78,7 @@ export function AdminSidebar() {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
+            if (item.superAdminOnly && role !== "SUPER_ADMIN") return null;
             const isActive = item.exact
               ? pathname === item.href
               : pathname.startsWith(item.href);

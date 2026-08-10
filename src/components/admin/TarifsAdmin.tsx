@@ -13,8 +13,8 @@ export function TarifsAdmin({
   exchangeRates: ExchangeRate[];
   shippingRates: ShippingRate[];
 }) {
-  const [rates, setRates] = useState(exchangeRates);
-  const [shipping, setShipping] = useState(shippingRates);
+  const rates = exchangeRates;
+  const shipping = shippingRates;
 
   async function saveExchangeRate(id: string, rate: number, description: string) {
     const result = await updateExchangeRate(id, rate, description);
