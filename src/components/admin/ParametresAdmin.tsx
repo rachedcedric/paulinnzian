@@ -15,6 +15,7 @@ const generalFields = [
   { key: "address_abidjan", label: "Adresse Abidjan" },
   { key: "facebook_url", label: "Facebook URL" },
   { key: "instagram_url", label: "Instagram URL" },
+  { key: "tiktok_url", label: "TikTok URL" },
   { key: "hero_title", label: "Titre Hero" },
   { key: "hero_subtitle", label: "Sous-titre Hero" },
   { key: "meta_description", label: "Meta description SEO" },

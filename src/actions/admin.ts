@@ -41,7 +41,7 @@ const requireSuperAdmin = () => requireRole(SUPER_ADMIN_ROLES);
 
 const SITE_SETTING_KEYS = new Set([
   "site_name", "site_slogan", "whatsapp_number", "whatsapp_link", "phone_ci",
-  "address_paris", "address_abidjan", "facebook_url", "instagram_url", "hero_title",
+  "address_paris", "address_abidjan", "facebook_url", "instagram_url", "tiktok_url", "hero_title",
   "hero_subtitle", "meta_description", "facebook_pixel_id", "google_ads_id",
   "google_analytics_id", "tiktok_pixel_id",
 ]);
@@ -49,6 +49,7 @@ const SETTING_URL_HOSTS: Record<string, readonly string[]> = {
   whatsapp_link: ["wa.me", "api.whatsapp.com"],
   facebook_url: ["facebook.com", "www.facebook.com"],
   instagram_url: ["instagram.com", "www.instagram.com"],
+  tiktok_url: ["tiktok.com", "www.tiktok.com"],
 };
 
 function validateSiteSettings(data: unknown) {

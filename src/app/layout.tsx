@@ -65,6 +65,7 @@ export default async function RootLayout({
         <LayoutWrapper
           facebookUrl={settings.facebook_url || "https://www.facebook.com/profile.php?id=61570727913162"}
           instagramUrl={settings.instagram_url || "https://www.instagram.com/paulinnzianofficiel"}
+          tiktokUrl={settings.tiktok_url || "https://www.tiktok.com/@paulinnzianofficiel"}
           whatsappUrl={settings.whatsapp_link || "https://wa.me/33637036839"}
           whatsappNumber={settings.whatsapp_number || "+33 6 37 03 68 39"}
           phoneCi={settings.phone_ci || "+225 07 77 06 13 30"}

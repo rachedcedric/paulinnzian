@@ -198,6 +198,7 @@ async function main() {
     { key: "address_abidjan", value: "Cocody Faya, Abidjan" },
     { key: "facebook_url", value: "#" },
     { key: "instagram_url", value: "#" },
+    { key: "tiktok_url", value: "https://www.tiktok.com/@paulinnzianofficiel" },
     { key: "hero_title", value: "ACHETEZ MOINS CHER SUR VOS BOUTIQUES PRÉFÉRÉES." },
     { key: "hero_subtitle", value: "Votre Personal Shopper pour vos achats en Europe." },
     { key: "meta_description", value: "Personal Shopper pour vos achats sur SHEIN, Fashion Nova, Zara, Amazon, Apple, Samsung et vos boutiques préférées. Tarifs transparents, zéro frais caché et réexpédition de vos colis." },

@@ -2,14 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { MessageCircle } from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { SiTiktok } from "react-icons/si";
 import { useSiteConfig } from "./SiteConfigContext";
 
 interface FooterProps {
   facebookUrl: string;
   instagramUrl: string;
+  tiktokUrl: string;
 }
 
-export function Footer({ facebookUrl, instagramUrl }: FooterProps) {
+export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
   const {
     whatsappUrl,
     whatsappNumber,
@@ -62,6 +64,16 @@ export function Footer({ facebookUrl, instagramUrl }: FooterProps) {
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#1877F2] transition-colors"
               >
                 <FaFacebookF className="w-4 h-4 text-white" />
+              </a>
+              <a
+                href={tiktokUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                title="TikTok"
+                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white transition-colors group"
+              >
+                <SiTiktok className="w-4 h-4 text-white group-hover:text-black" />
               </a>
             </div>
           </div>

@@ -10,6 +10,7 @@ interface LayoutWrapperProps {
   children: React.ReactNode;
   facebookUrl: string;
   instagramUrl: string;
+  tiktokUrl: string;
   whatsappUrl: string;
   whatsappNumber: string;
   phoneCi: string;
@@ -21,7 +22,7 @@ interface LayoutWrapperProps {
   heroSubtitle: string;
 }
 
-export function LayoutWrapper({ children, facebookUrl, instagramUrl, ...siteConfig }: LayoutWrapperProps) {
+export function LayoutWrapper({ children, facebookUrl, instagramUrl, tiktokUrl, ...siteConfig }: LayoutWrapperProps) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
 
@@ -29,7 +30,7 @@ export function LayoutWrapper({ children, facebookUrl, instagramUrl, ...siteConf
     <SiteConfigProvider value={siteConfig}>
       {!isAdmin && <Header />}
       <main className="flex-1">{children}</main>
-      {!isAdmin && <Footer facebookUrl={facebookUrl} instagramUrl={instagramUrl} />}
+      {!isAdmin && <Footer facebookUrl={facebookUrl} instagramUrl={instagramUrl} tiktokUrl={tiktokUrl} />}
       {!isAdmin && <FloatingButtons />}
     </SiteConfigProvider>
   );
