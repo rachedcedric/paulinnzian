@@ -145,6 +145,32 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
           </div>
         </div>
 
+        <div className="mb-8 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
+          <div>
+            <p className="text-center text-xs font-semibold uppercase text-gray-500 sm:text-left">
+              Partenaire transport
+            </p>
+            <p className="mt-1 text-center text-sm text-gray-400 sm:text-left">
+              Expédition et acheminement avec Alizé Fret
+            </p>
+          </div>
+          <a
+            href="https://alizefret.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visiter le site d'Alizé Fret, partenaire transport"
+            className="block w-52 rounded-lg bg-white px-4 py-3 transition-opacity hover:opacity-90 sm:w-56"
+          >
+            <Image
+              src="/alizefret-logo.svg"
+              alt="Alizé Fret"
+              width={400}
+              height={100}
+              className="h-auto w-full"
+            />
+          </a>
+        </div>
+
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
             © {year} Paulin N'ZIAN - Personal Shopper. Tous droits réservés.
