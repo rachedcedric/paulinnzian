@@ -5,13 +5,13 @@ import { XCircle, CheckCircle } from "lucide-react";
 
 export function ComparisonSection() {
   return (
-    <section className="py-20 bg-[#F5F5F5]">
+    <section className="bg-[#F5F5F5] py-12 sm:py-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="mb-10 text-center sm:mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
             POURQUOI MES CLIENTS{" "}
@@ -22,7 +22,7 @@ export function ComparisonSection() {
         <div className="grid md:grid-cols-3 gap-6 items-center">
           {/* Others */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="bg-white rounded-2xl p-7 border-2 border-gray-200"
@@ -45,7 +45,7 @@ export function ComparisonSection() {
 
           {/* VS */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={false}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
@@ -58,7 +58,7 @@ export function ComparisonSection() {
 
           {/* Us */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="bg-black rounded-2xl p-7 border-2 border-[#FF6500]"

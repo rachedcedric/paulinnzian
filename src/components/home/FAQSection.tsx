@@ -15,13 +15,13 @@ export function FAQSection({ faqs }: FAQSectionProps) {
   if (faqs.length === 0) return null;
 
   return (
-    <section className="py-20 bg-[#F5F5F5]">
+    <section className="bg-[#F5F5F5] py-12 sm:py-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-14"
+          className="mb-10 text-center sm:mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
             QUESTIONS{" "}
@@ -34,7 +34,7 @@ export function FAQSection({ faqs }: FAQSectionProps) {
           {faqs.map((faq, i) => (
             <motion.div
               key={faq.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={false}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}

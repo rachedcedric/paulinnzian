@@ -18,9 +18,9 @@ export function HeroSection({ exchangeRates }: { exchangeRates: ExchangeRate[] }
   const sheinRate = exchangeRates.find((rate) => rate.name.toLowerCase().includes("shein"));
   const otherRate = exchangeRates.find((rate) => rate.id !== sheinRate?.id);
   return (
-    <section className="min-h-screen bg-white flex items-center pt-20 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+    <section className="overflow-hidden bg-white pt-20">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
           {/* Content */}
           <motion.div
             initial={false}
