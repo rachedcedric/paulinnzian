@@ -26,7 +26,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
     resolver: zodResolver(orderSchema) as any,
   });
 
-  const { register: regEvent, handleSubmit: handleEvent, reset: resetEvent, formState: { isSubmitting: eventSubmitting } } = useForm<TrackingEventFormData>({
+  const { register: regEvent, handleSubmit: handleEvent, reset: resetEvent, formState: { errors: eventErrors, isSubmitting: eventSubmitting } } = useForm<TrackingEventFormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(trackingEventSchema) as any,
   });
@@ -178,7 +178,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
             <div className="mb-5">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold">Événements de suivi</h3>
-                <button onClick={() => { resetEvent({ orderId: viewOrder.id, status: "PENDING", title: "", eventDate: new Date().toISOString().split("T")[0], displayOrder: 0 }); setShowEventForm(true); }} className="flex items-center gap-1 text-sm text-[#FF6500] font-semibold">
+                <button onClick={() => { resetEvent({ orderId: viewOrder.id, status: "PENDING", title: "", eventDate: formatDateInput(), displayOrder: 0 }); setShowEventForm(true); }} className="flex items-center gap-1 text-sm text-[#FF6500] font-semibold">
                   <PlusCircle className="w-4 h-4" />Ajouter
                 </button>
               </div>
@@ -191,7 +191,8 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
                         {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                       </select></div>
                     <div><label className="block text-xs font-semibold mb-1">Date *</label>
-                      <input {...regEvent("eventDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                      <input {...regEvent("eventDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" />
+                      {eventErrors.eventDate && <p className="mt-1 text-xs text-red-500">Date invalide</p>}</div>
                   </div>
                   <div><label className="block text-xs font-semibold mb-1">Titre *</label>
                     <input {...regEvent("title")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>

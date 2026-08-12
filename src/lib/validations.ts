@@ -48,7 +48,12 @@ export const trackingEventSchema = z.object({
   title: z.string().trim().min(1, "Le titre est requis").max(150),
   description: z.string().trim().max(1_000).optional(),
   location: z.string().trim().max(150).optional(),
-  eventDate: z.iso.datetime({ local: true }),
+  eventDate: z.preprocess(
+    (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+      ? `${value}T12:00:00`
+      : value,
+    z.iso.datetime({ local: true }),
+  ),
   displayOrder: z.coerce.number().int().min(0).max(10_000).default(0),
 });
 

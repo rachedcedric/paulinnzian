@@ -49,4 +49,10 @@ test("orders and tracking events require valid business dates", () => {
     title: "Commande achetée",
     eventDate: "2026-08-10T12:30",
   }).success, true);
+  assert.equal(trackingEventSchema.parse({
+    orderId: "order-1",
+    status: "PURCHASED",
+    title: "Commande achetée",
+    eventDate: "2026-08-12",
+  }).eventDate, "2026-08-12T12:00:00");
 });
