@@ -59,10 +59,10 @@ export function HeroVisual({ stores, image }: { stores: Store[]; image?: string 
       )}
 
       {/* Bottom scrim for legibility of the shopping bags row */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 bg-gradient-to-t from-[#071225]/80 to-transparent" />
+      {!image && <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20 bg-gradient-to-t from-[#071225]/80 to-transparent" />}
 
-      {/* Shopping bags row */}
-      {featured.length > 0 && (
+      {/* Shopping bags row (only for the default illustration — a custom photo already shows real bags) */}
+      {!image && featured.length > 0 && (
         <div className="absolute bottom-3 sm:bottom-5 left-0 right-0 flex items-end justify-center gap-1.5 sm:gap-2.5 px-3">
           {featured.map((store, i) => (
             <div
