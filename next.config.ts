@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      // Accommodates the base64 hero image upload in Paramètres (up to ~8MB encoded).
+      bodySizeLimit: "10mb",
+    },
+  },
   async headers() {
     const developmentEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
     const contentSecurityPolicy = [
