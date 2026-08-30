@@ -10,8 +10,18 @@ interface SiteConfig {
   addressAbidjan: string;
   siteName: string;
   siteSlogan: string;
+  heroEyebrow: string;
   heroTitle: string;
+  heroTitleHighlight: string;
+  heroTitleAfter: string;
+  heroTagline: string;
   heroSubtitle: string;
+  heroCtaPrimary: string;
+  heroCtaSecondary: string;
+  heroImage: string;
+  announcementEnabled: boolean;
+  announcementText: string;
+  announcementLink: string;
 }
 
 const SiteConfigContext = createContext<SiteConfig | null>(null);

@@ -32,6 +32,13 @@ export function formatDateTime(date: Date | string): string {
   });
 }
 
+export function formatAnnouncementText(text: string, dateInput?: string): string {
+  if (!dateInput) return text;
+  const date = new Date(`${dateInput}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return text;
+  return text ? `${text} ${formatDate(date)}` : formatDate(date);
+}
+
 export function encodeWhatsAppMessage(message: string): string {
   return encodeURIComponent(message);
 }

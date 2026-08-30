@@ -56,9 +56,9 @@ export function TrackingClient() {
       <div className="bg-black text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Package className="w-12 h-12 text-[#FF6500] mx-auto mb-4" />
+            <Package className="w-12 h-12 text-[#D99A12] mx-auto mb-4" />
             <h1 className="text-4xl sm:text-5xl font-black mb-4">
-              SUIVRE VOTRE <span className="text-[#FF6500]">COMMANDE</span>
+              SUIVRE VOTRE <span className="text-[#D99A12]">COMMANDE</span>
             </h1>
             <p className="text-gray-400 text-lg">
               Entrez votre numéro de suivi pour connaître l'avancement de votre commande.
@@ -77,13 +77,13 @@ export function TrackingClient() {
               placeholder="Ex: PNZ-2026-001245"
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6500] text-lg"
+              className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#D99A12] text-lg"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#FF6500] hover:bg-[#e55a00] disabled:opacity-50 text-white font-bold px-6 py-4 rounded-xl transition-colors whitespace-nowrap"
+            className="bg-[#D99A12] hover:bg-[#C8912D] disabled:opacity-50 text-white font-bold px-6 py-4 rounded-xl transition-colors whitespace-nowrap"
           >
             {loading ? "..." : "SUIVRE"}
           </button>
@@ -112,9 +112,9 @@ export function TrackingClient() {
               <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Numéro de suivi</p>
-                  <p className="font-black text-xl text-[#FF6500]">{order.trackingNumber}</p>
+                  <p className="font-black text-xl text-[#D99A12]">{order.trackingNumber}</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold bg-[#FF6500]/10 text-[#FF6500]`}>
+                <span className={`px-3 py-1 rounded-full text-sm font-semibold bg-[#D99A12]/10 text-[#D99A12]`}>
                   {ORDER_STATUS_LABELS[order.status]}
                 </span>
               </div>
@@ -126,7 +126,7 @@ export function TrackingClient() {
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Destination</p>
                   <p className="font-semibold text-black flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-[#FF6500]" />
+                    <MapPin className="w-3 h-3 text-[#D99A12]" />
                     {order.destinationCity}, {order.destinationCountry}
                   </p>
                 </div>
@@ -148,7 +148,7 @@ export function TrackingClient() {
                       <div key={event.id} className="flex gap-4">
                         <div className="flex flex-col items-center">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            isLast ? "bg-[#FF6500]" : "bg-gray-200"
+                            isLast ? "bg-[#D99A12]" : "bg-gray-200"
                           }`}>
                             {isLast
                               ? <Circle className="w-4 h-4 text-white fill-white" />
@@ -158,7 +158,7 @@ export function TrackingClient() {
                           {!isLast && <div className="w-0.5 h-8 bg-gray-200 my-1" />}
                         </div>
                         <div className="pb-8 pt-1">
-                          <p className={`font-bold ${isLast ? "text-[#FF6500]" : "text-black"}`}>
+                          <p className={`font-bold ${isLast ? "text-[#D99A12]" : "text-black"}`}>
                             {event.title}
                           </p>
                           {event.description && (

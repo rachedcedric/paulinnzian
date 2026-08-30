@@ -26,7 +26,7 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
         <div className="max-w-7xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl sm:text-5xl font-black mb-4">
-              NOS <span className="text-[#FF6500]">BOUTIQUES</span> EN LIGNE
+              NOS <span className="text-[#D99A12]">BOUTIQUES</span> EN LIGNE
             </h1>
             <p className="text-gray-400 text-lg max-w-xl mx-auto">
               Découvrez les boutiques sur lesquelles nous pouvons effectuer vos achats.
@@ -45,7 +45,7 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
               placeholder="Rechercher une boutique..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] bg-[#F5F5F5]"
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] bg-[#F5F5F5]"
             />
           </div>
         </div>
@@ -58,7 +58,7 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
               onClick={() => setCategory(cat)}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                 category === cat
-                  ? "bg-[#FF6500] text-white"
+                  ? "bg-[#D99A12] text-white"
                   : "bg-[#F5F5F5] text-gray-700 hover:bg-gray-200"
               }`}
             >
@@ -109,7 +109,7 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
                   {store.name}
                 </p>
                 <span className="text-xs text-gray-400 group-hover:text-gray-300 mb-3">{store.category}</span>
-                <div className="flex items-center gap-1 text-xs text-[#FF6500] font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 text-xs text-[#D99A12] font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                   <ExternalLink className="w-3 h-3" />
                   Ouvrir
                 </div>

@@ -106,13 +106,13 @@ export function MarketingTracking({
         >
           <p className="text-sm leading-relaxed text-gray-300 sm:flex-1">
             Nous utilisons des cookies de mesure et de publicité uniquement avec votre accord. Le refus ne limite aucune fonction du site. {" "}
-            <Link href="/cookies" className="font-semibold text-[#FF6500] hover:underline">En savoir plus</Link>
+            <Link href="/cookies" className="font-semibold text-[#D99A12] hover:underline">En savoir plus</Link>
           </p>
           <div className="mt-4 flex gap-3 sm:mt-0">
             <button type="button" onClick={() => saveConsent("rejected")} className="flex-1 rounded-lg border border-gray-500 px-4 py-2 text-sm font-semibold hover:bg-gray-900 sm:flex-none">
               Refuser
             </button>
-            <button type="button" onClick={() => saveConsent("accepted")} className="flex-1 rounded-lg bg-[#FF6500] px-4 py-2 text-sm font-semibold hover:bg-[#e65b00] sm:flex-none">
+            <button type="button" onClick={() => saveConsent("accepted")} className="flex-1 rounded-lg bg-[#D99A12] px-4 py-2 text-sm font-semibold hover:bg-[#e65b00] sm:flex-none">
               Accepter
             </button>
           </div>

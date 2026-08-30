@@ -44,7 +44,7 @@ export function FloatingButtons() {
         onClick={scrollToTop}
         aria-label="Retour en haut"
         className={cn(
-          "w-11 h-11 bg-black hover:bg-[#FF6500] text-white rounded-full shadow-lg flex items-center justify-center transition-all",
+          "w-11 h-11 bg-black hover:bg-[#D99A12] text-white rounded-full shadow-lg flex items-center justify-center transition-all",
           showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         )}
       >

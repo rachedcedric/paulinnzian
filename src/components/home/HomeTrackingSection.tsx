@@ -42,7 +42,7 @@ export function HomeTrackingSection() {
     <section className="bg-black px-4 py-10 sm:px-6">
       <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-[0.8fr_1.2fr]">
         <div>
-          <div className="mb-3 flex items-center gap-2 text-[#FF6500]">
+          <div className="mb-3 flex items-center gap-2 text-[#D99A12]">
             <PackageSearch className="h-5 w-5" />
             <span className="text-xs font-bold uppercase">Suivi en temps réel</span>
           </div>
@@ -61,13 +61,13 @@ export function HomeTrackingSection() {
                 onChange={(event) => setTrackingNumber(event.target.value)}
                 placeholder="Ex : PNZ-2026-001245"
                 aria-label="Numéro de suivi"
-                className="h-14 w-full rounded-xl border border-white/15 bg-white pl-12 pr-4 text-black outline-none focus:border-[#FF6500]"
+                className="h-14 w-full rounded-xl border border-white/15 bg-white pl-12 pr-4 text-black outline-none focus:border-[#D99A12]"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="h-14 rounded-xl bg-[#FF6500] px-7 font-bold text-white transition-colors hover:bg-[#e55a00] disabled:opacity-50"
+              className="h-14 rounded-xl bg-[#D99A12] px-7 font-bold text-white transition-colors hover:bg-[#C8912D] disabled:opacity-50"
             >
               {loading ? "Recherche..." : "Suivre"}
             </button>
@@ -85,13 +85,13 @@ export function HomeTrackingSection() {
                 <p className="text-xs text-gray-400">{order.trackingNumber} · {order.customerName}</p>
                 <p className="mt-1 font-bold text-white">{ORDER_STATUS_LABELS[order.status]}</p>
                 <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
-                  <MapPin className="h-3 w-3 text-[#FF6500]" />
+                  <MapPin className="h-3 w-3 text-[#D99A12]" />
                   {order.destinationCity}, {order.destinationCountry}
                 </p>
               </div>
               <Link
                 href="/suivi"
-                className="inline-flex items-center gap-2 text-sm font-bold text-[#FF6500] hover:text-white"
+                className="inline-flex items-center gap-2 text-sm font-bold text-[#D99A12] hover:text-white"
               >
                 Voir le suivi détaillé <ArrowRight className="h-4 w-4" />
               </Link>

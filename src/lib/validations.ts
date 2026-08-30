@@ -92,6 +92,25 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Mot de passe trop court"),
 });
 
+export const devisLineSchema = z.object({
+  store: z.string().trim().max(100, "100 caractères maximum").optional().or(z.literal("")),
+  cartAmount: z.coerce
+    .number({ message: "Montant invalide" })
+    .finite("Montant invalide")
+    .positive("Le montant du panier doit être supérieur à 0"),
+  shippingFee: z.preprocess(
+    (value) => (value === "" || value === null || value === undefined ? 0 : value),
+    z.coerce
+      .number({ message: "Montant invalide" })
+      .finite("Montant invalide")
+      .nonnegative("Les frais de livraison ne peuvent pas être négatifs")
+  ),
+});
+
+export const devisFormSchema = z.object({
+  lines: z.array(devisLineSchema).min(1, "Ajoutez au moins une boutique"),
+});
+
 export type ContactFormData = z.infer<typeof contactSchema>;
 export type StoreFormData = z.infer<typeof storeSchema>;
 export type OrderFormData = z.infer<typeof orderSchema>;
@@ -99,3 +118,7 @@ export type TrackingEventFormData = z.infer<typeof trackingEventSchema>;
 export type TestimonialFormData = z.infer<typeof testimonialSchema>;
 export type FAQFormData = z.infer<typeof faqSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
+export type DevisLineFormData = z.infer<typeof devisLineSchema>;
+export type DevisFormData = z.infer<typeof devisFormSchema>;
+/** Raw shape of the fields while the user is still typing (before zod coercion). */
+export type DevisFormInput = z.input<typeof devisFormSchema>;

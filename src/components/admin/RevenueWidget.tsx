@@ -48,7 +48,7 @@ export function RevenueWidget({ totalRevenue, revenueDay, revenueWeek, revenueMo
             key={key}
             onClick={() => setPeriod(key)}
             className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all ${
-              period === key ? "bg-[#FF6500] text-white shadow-sm" : "text-gray-500 hover:text-black"
+              period === key ? "bg-[#D99A12] text-white shadow-sm" : "text-gray-500 hover:text-black"
             }`}
           >
             {label}
@@ -63,7 +63,7 @@ export function RevenueWidget({ totalRevenue, revenueDay, revenueWeek, revenueMo
           {period === "month" && "Ce mois-ci"}
           {period === "year" && "Cette année"}
         </p>
-        <p className="text-3xl font-black text-[#FF6500]">{fmt(values[period])}</p>
+        <p className="text-3xl font-black text-[#D99A12]">{fmt(values[period])}</p>
       </div>
     </div>
   );

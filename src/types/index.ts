@@ -119,8 +119,15 @@ export interface SiteSettings {
   address_abidjan: string;
   facebook_url: string;
   instagram_url: string;
-  hero_title: string;
-  hero_subtitle: string;
+  hero_eyebrow: string;
+  hero_title_before: string;
+  hero_title_highlight: string;
+  hero_title_after: string;
+  hero_tagline: string;
+  hero_subtitle_text: string;
+  hero_cta_primary: string;
+  hero_cta_secondary: string;
+  hero_image: string;
   meta_description: string;
   [key: string]: string;
 }
@@ -139,7 +146,7 @@ export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   PENDING: "text-yellow-600 bg-yellow-50",
   PURCHASED: "text-blue-600 bg-blue-50",
   RECEIVED_PARIS: "text-purple-600 bg-purple-50",
-  SHIPPED_DESTINATION: "text-orange-600 bg-orange-50",
+  SHIPPED_DESTINATION: "text-pink-600 bg-pink-50",
   ARRIVED_DESTINATION: "text-teal-600 bg-teal-50",
   DELIVERED: "text-green-600 bg-green-50",
   CANCELLED: "text-red-600 bg-red-50",

@@ -72,7 +72,7 @@ export function AdminUsers({ initialUsers }: { initialUsers: AdminUserItem[] }) 
           <h1 className="text-2xl font-black text-black">Administrateurs</h1>
           <p className="text-sm text-gray-500">Gérez les accès et les rôles.</p>
         </div>
-        <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#FF6500] px-5 py-2.5 font-semibold text-white">
+        <button onClick={openCreate} className="flex items-center gap-2 rounded-xl bg-[#D99A12] px-5 py-2.5 font-semibold text-white">
           <Plus className="w-5 h-5" /> Ajouter
         </button>
       </div>
@@ -88,7 +88,7 @@ export function AdminUsers({ initialUsers }: { initialUsers: AdminUserItem[] }) 
                 <tr key={user.id} className="border-t border-gray-100">
                   <td className="px-5 py-4 font-semibold text-black">{user.name}</td>
                   <td className="px-5 py-4 text-gray-600">{user.email}</td>
-                  <td className="px-5 py-4"><span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-bold text-[#FF6500]">{user.role}</span></td>
+                  <td className="px-5 py-4"><span className="rounded-full bg-[#D99A12]/10 px-2.5 py-1 text-xs font-bold text-[#D99A12]">{user.role}</span></td>
                   <td className="px-5 py-4 text-right">
                     <button onClick={() => openEdit(user)} aria-label="Modifier" className="p-2 text-gray-500"><Pencil className="w-4 h-4" /></button>
                     <button onClick={() => remove(user)} aria-label="Supprimer" className="p-2 text-red-500"><Trash2 className="w-4 h-4" /></button>
@@ -112,7 +112,7 @@ export function AdminUsers({ initialUsers }: { initialUsers: AdminUserItem[] }) 
               <div><label className="mb-1 block text-sm font-semibold">Email</label><input required type="email" disabled={Boolean(editing)} value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="w-full rounded-lg border px-3 py-2.5 disabled:bg-gray-100" /></div>
               <div><label className="mb-1 block text-sm font-semibold">Rôle</label><select value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value as AdminRole })} className="w-full rounded-lg border px-3 py-2.5"><option value="EDITOR">Éditeur</option><option value="ADMIN">Administrateur</option><option value="SUPER_ADMIN">Super administrateur</option></select></div>
               <div><label className="mb-1 block text-sm font-semibold">{editing ? "Nouveau mot de passe (facultatif)" : "Mot de passe"}</label><input required={!editing} minLength={12} type="password" autoComplete="new-password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} className="w-full rounded-lg border px-3 py-2.5" /></div>
-              <div className="flex gap-3 pt-2"><button type="button" onClick={() => setOpen(false)} className="flex-1 rounded-xl border px-4 py-2.5 font-semibold">Annuler</button><button disabled={saving} className="flex-1 rounded-xl bg-[#FF6500] px-4 py-2.5 font-semibold text-white disabled:opacity-50">{saving ? "Enregistrement..." : "Enregistrer"}</button></div>
+              <div className="flex gap-3 pt-2"><button type="button" onClick={() => setOpen(false)} className="flex-1 rounded-xl border px-4 py-2.5 font-semibold">Annuler</button><button disabled={saving} className="flex-1 rounded-xl bg-[#D99A12] px-4 py-2.5 font-semibold text-white disabled:opacity-50">{saving ? "Enregistrement..." : "Enregistrer"}</button></div>
             </form>
           </div>
         </div>

@@ -25,7 +25,7 @@ export function FAQSection({ faqs }: FAQSectionProps) {
         >
           <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
             QUESTIONS{" "}
-            <span className="text-[#FF6500]">FRÉQUENTES</span>
+            <span className="text-[#D99A12]">FRÉQUENTES</span>
           </h2>
           <p className="text-gray-600">Tout ce que vous devez savoir sur notre service.</p>
         </motion.div>
@@ -51,7 +51,7 @@ export function FAQSection({ faqs }: FAQSectionProps) {
                   transition={{ duration: 0.2 }}
                   className="flex-shrink-0"
                 >
-                  <ChevronDown className="w-5 h-5 text-[#FF6500]" />
+                  <ChevronDown className="w-5 h-5 text-[#D99A12]" />
                 </motion.div>
               </button>
 

@@ -58,7 +58,7 @@ export function AdminSidebar({ role }: { role?: string }) {
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <Link href="/admin" className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#FF6500] rounded-lg flex items-center justify-center">
+              <div className="w-9 h-9 bg-[#D99A12] rounded-lg flex items-center justify-center">
                 <ShoppingBag className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -90,7 +90,7 @@ export function AdminSidebar({ role }: { role?: string }) {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   isActive
-                    ? "bg-[#FF6500] text-white"
+                    ? "bg-[#D99A12] text-white"
                     : "text-gray-400 hover:text-white hover:bg-white/10"
                 )}
               >

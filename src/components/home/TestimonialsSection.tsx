@@ -34,7 +34,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
         >
           <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
             CE QUE DISENT NOS{" "}
-            <span className="text-[#FF6500]">CLIENTS</span>
+            <span className="text-[#D99A12]">CLIENTS</span>
           </h2>
         </motion.div>
 
@@ -51,7 +51,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
               {/* Stars */}
               <div className="flex justify-center gap-1 mb-6">
                 {Array.from({ length: testimonials[current].rating }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-[#FF6500] fill-current" />
+                  <Star key={i} className="w-5 h-5 text-[#D99A12] fill-current" />
                 ))}
               </div>
 
@@ -72,7 +72,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
                     className="w-12 h-12 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-[#FF6500] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="w-12 h-12 bg-[#D99A12] rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {testimonials[current].name.charAt(0)}
                   </div>
                 )}
@@ -89,7 +89,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
             <div className="flex items-center justify-center gap-4 mt-6">
               <button
                 onClick={() => setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:border-[#FF6500] hover:text-[#FF6500] transition-colors"
+                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:border-[#D99A12] hover:text-[#D99A12] transition-colors"
                 aria-label="Précédent"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -101,7 +101,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
                     key={i}
                     onClick={() => setCurrent(i)}
                     className={`w-2 h-2 rounded-full transition-all ${
-                      i === current ? "bg-[#FF6500] w-6" : "bg-gray-300"
+                      i === current ? "bg-[#D99A12] w-6" : "bg-gray-300"
                     }`}
                     aria-label={`Témoignage ${i + 1}`}
                   />
@@ -110,7 +110,7 @@ export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) 
 
               <button
                 onClick={() => setCurrent((prev) => (prev + 1) % testimonials.length)}
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:border-[#FF6500] hover:text-[#FF6500] transition-colors"
+                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:border-[#D99A12] hover:text-[#D99A12] transition-colors"
                 aria-label="Suivant"
               >
                 <ChevronRight className="w-5 h-5" />

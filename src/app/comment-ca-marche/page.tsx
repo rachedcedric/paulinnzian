@@ -72,7 +72,7 @@ export default async function CommentCaMarchePage() {
       <div className="bg-black text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl font-black mb-4">
-            COMMENT ÇA <span className="text-[#FF6500]">MARCHE</span> ?
+            COMMENT ÇA <span className="text-[#D99A12]">MARCHE</span> ?
           </h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Un service simple, transparent et sécurisé en 8 étapes.
@@ -90,13 +90,13 @@ export default async function CommentCaMarchePage() {
             >
               <div className="flex flex-col items-center">
                 <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <step.icon className="w-6 h-6 text-[#FF6500]" />
+                  <step.icon className="w-6 h-6 text-[#D99A12]" />
                 </div>
                 {i < steps.length - 1 && <div className="w-0.5 h-6 bg-gray-200 my-2" />}
               </div>
               <div className="pt-2 pb-6">
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="text-sm font-bold text-[#FF6500]">{step.number}</span>
+                  <span className="text-sm font-bold text-[#D99A12]">{step.number}</span>
                   <h3 className="font-black text-black text-lg">{step.title}</h3>
                 </div>
                 <p className="text-gray-600">{step.description}</p>
@@ -108,7 +108,7 @@ export default async function CommentCaMarchePage() {
         {/* Payment methods */}
         <div className="bg-[#F5F5F5] rounded-3xl p-8 lg:p-10">
           <h2 className="text-2xl font-black text-black mb-6">
-            MODES DE <span className="text-[#FF6500]">PAIEMENT</span>
+            MODES DE <span className="text-[#D99A12]">PAIEMENT</span>
           </h2>
           <div className="grid sm:grid-cols-2 gap-4 mb-6">
             {["ESPÈCES", "MOBILE MONEY"].map((method) => (
@@ -125,9 +125,9 @@ export default async function CommentCaMarchePage() {
 
         {/* Physical store service */}
         <div className="bg-black rounded-3xl p-8 lg:p-10 text-white">
-          <Store className="w-10 h-10 text-[#FF6500] mb-4" />
+          <Store className="w-10 h-10 text-[#D99A12] mb-4" />
           <h2 className="text-2xl font-black text-white mb-3">
-            ACHATS EN <span className="text-[#FF6500]">MAGASIN</span>
+            ACHATS EN <span className="text-[#D99A12]">MAGASIN</span>
           </h2>
           <p className="text-gray-400 mb-6">
             Pour certains articles, nous pouvons nous déplacer directement en boutique en France.
@@ -146,7 +146,7 @@ export default async function CommentCaMarchePage() {
             href={storeRequestUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#FF6500] hover:bg-[#e55a00] text-white font-bold px-8 py-4 rounded-full transition-all"
+            className="inline-flex items-center gap-2 bg-[#D99A12] hover:bg-[#C8912D] text-white font-bold px-8 py-4 rounded-full transition-all"
           >
             DEMANDER UN ACHAT EN MAGASIN
           </a>

@@ -1,28 +1,29 @@
 import { HeroSection } from "@/components/home/HeroSection";
-import { HomeTrackingSection } from "@/components/home/HomeTrackingSection";
-import { WhyChooseSection } from "@/components/home/WhyChooseSection";
 import { HowToOrderSection } from "@/components/home/HowToOrderSection";
+import { StoresBand } from "@/components/home/StoresBand";
+import { TarifsTeaserSection } from "@/components/home/TarifsTeaserSection";
 import { ComparisonSection } from "@/components/home/ComparisonSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { ContactSection } from "@/components/home/ContactSection";
-import { getTestimonials, getFAQs, getExchangeRates } from "@/actions/public";
+import { getTestimonials, getFAQs, getStores, getShippingRates } from "@/actions/public";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [testimonials, faqs, exchangeRates] = await Promise.all([
+  const [testimonials, faqs, stores, shippingRates] = await Promise.all([
     getTestimonials(),
     getFAQs(),
-    getExchangeRates(),
+    getStores(),
+    getShippingRates(),
   ]);
 
   return (
     <>
-      <HeroSection exchangeRates={exchangeRates} />
-      <HomeTrackingSection />
-      <WhyChooseSection />
+      <HeroSection stores={stores} />
       <HowToOrderSection />
+      <StoresBand stores={stores} />
+      <TarifsTeaserSection shippingRates={shippingRates} />
       <ComparisonSection />
       <TestimonialsSection testimonials={testimonials} />
       <FAQSection faqs={faqs} />

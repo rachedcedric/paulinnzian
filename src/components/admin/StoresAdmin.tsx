@@ -135,7 +135,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 bg-[#FF6500] hover:bg-[#e55a00] text-white font-semibold px-5 py-2.5 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-[#D99A12] hover:bg-[#C8912D] text-white font-semibold px-5 py-2.5 rounded-xl transition-colors"
         >
           <Plus className="w-5 h-5" />
           Ajouter
@@ -160,7 +160,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                   <label className="block text-sm font-semibold mb-1">Nom *</label>
                   <input
                     {...register("name")}
-                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                   />
                   {errors.name && (
                     <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
@@ -170,7 +170,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                   <label className="block text-sm font-semibold mb-1">Slug *</label>
                   <input
                     {...register("slug")}
-                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                   />
                   {errors.slug && (
                     <p className="text-red-500 text-xs mt-1">{errors.slug.message}</p>
@@ -193,7 +193,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                       />
                     </div>
                   )}
-                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#FF6500] hover:bg-orange-50 transition-colors">
+                  <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#D99A12] hover:bg-[#D99A12]/10 transition-colors">
                     <Upload className="w-5 h-5 text-gray-400" />
                     <span className="text-sm font-semibold text-gray-600">
                       Sélectionner une image
@@ -227,7 +227,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                 <input
                   {...register("websiteUrl")}
                   type="url"
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                 />
                 {errors.websiteUrl && (
                   <p className="text-red-500 text-xs mt-1">{errors.websiteUrl.message}</p>
@@ -239,7 +239,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                   <label className="block text-sm font-semibold mb-1">Catégorie *</label>
                   <select
                     {...register("category")}
-                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                   >
                     {STORE_CATEGORIES.filter((c) => c !== "Tous").map((c) => (
                       <option key={c} value={c}>
@@ -253,7 +253,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                   <input
                     {...register("displayOrder")}
                     type="number"
-                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                    className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                   />
                 </div>
               </div>
@@ -263,7 +263,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                 <textarea
                   {...register("description")}
                   rows={2}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none resize-none"
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none resize-none"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                   {...register("isActive")}
                   type="checkbox"
                   id="store-active"
-                  className="w-4 h-4 accent-[#FF6500]"
+                  className="w-4 h-4 accent-[#D99A12]"
                 />
                 <label htmlFor="store-active" className="text-sm font-semibold">
                   Active
@@ -290,7 +290,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-[#FF6500] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
+                  className="flex-1 bg-[#D99A12] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
                 >
                   {isSubmitting ? "..." : "Enregistrer"}
                 </button>
@@ -348,7 +348,7 @@ export function StoresAdmin({ initialStores }: { initialStores: Store[] }) {
                   <td className="px-4 py-3">
                     <button
                       onClick={() => handleToggle(store)}
-                      className="text-gray-400 hover:text-[#FF6500]"
+                      className="text-gray-400 hover:text-[#D99A12]"
                     >
                       {store.isActive ? (
                         <ToggleRight className="w-5 h-5 text-green-500" />

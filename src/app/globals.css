@@ -3,17 +3,30 @@
 :root {
   --background: #ffffff;
   --foreground: #000000;
-  --orange: #FF6500;
   --gray-light: #F5F5F5;
   --whatsapp: #25D366;
+  /* Premium homepage palette (Paris / Personal Shopper redesign) */
+  --gold: #D99A12;
+  --gold-premium: #C8912D;
+  --ink: #090B10;
+  --navy: #071225;
+  --cream: #FAFAF8;
+  --sky: #BFE3F5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-orange: var(--orange);
   --color-gray-light: var(--gray-light);
   --color-whatsapp: var(--whatsapp);
+  --color-gold: var(--gold);
+  --color-gold-premium: var(--gold-premium);
+  --color-ink: var(--ink);
+  --color-navy: var(--navy);
+  --color-cream: var(--cream);
+  --color-sky: var(--sky);
+  --font-script: var(--font-script);
+  --font-display: var(--font-display);
 }
 
 * {
@@ -37,5 +50,18 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 22s linear infinite;
 }
 

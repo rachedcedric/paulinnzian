@@ -51,7 +51,7 @@ export function WeightRevenueWidget({ weightRevenue }: Props) {
             key={key}
             onClick={() => setPeriod(key)}
             className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all ${
-              period === key ? "bg-[#FF6500] text-white shadow-sm" : "text-gray-500 hover:text-black"
+              period === key ? "bg-[#D99A12] text-white shadow-sm" : "text-gray-500 hover:text-black"
             }`}
           >
             {label}

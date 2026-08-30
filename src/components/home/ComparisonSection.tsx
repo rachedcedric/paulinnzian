@@ -15,7 +15,7 @@ export function ComparisonSection() {
         >
           <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
             POURQUOI MES CLIENTS{" "}
-            <span className="text-[#FF6500]">ÉCONOMISENT</span> ?
+            <span className="text-[#D99A12]">ÉCONOMISENT</span> ?
           </h2>
         </motion.div>
 
@@ -51,7 +51,7 @@ export function ComparisonSection() {
             transition={{ delay: 0.2 }}
             className="text-center"
           >
-            <div className="w-20 h-20 bg-[#FF6500] rounded-full flex items-center justify-center mx-auto shadow-lg">
+            <div className="w-20 h-20 bg-[#D99A12] rounded-full flex items-center justify-center mx-auto shadow-lg">
               <span className="text-white font-black text-2xl">VS</span>
             </div>
           </motion.div>
@@ -61,7 +61,7 @@ export function ComparisonSection() {
             initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-black rounded-2xl p-7 border-2 border-[#FF6500]"
+            className="bg-black rounded-2xl p-7 border-2 border-[#D99A12]"
           >
             <h3 className="font-black text-white text-center text-lg mb-6">
               AVEC PAULIN N'ZIAN

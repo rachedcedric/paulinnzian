@@ -93,7 +93,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-400 hover:text-[#FF6500] transition-colors"
+                    className="text-sm text-gray-400 hover:text-[#D99A12] transition-colors"
                   >
                     {link.label}
                   </Link>

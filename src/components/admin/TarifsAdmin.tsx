@@ -88,7 +88,7 @@ function ExchangeRateCard({
             type="number"
             value={value}
             onChange={(e) => setValue(Number(e.target.value))}
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
           />
         </div>
         <div>
@@ -96,13 +96,13 @@ function ExchangeRateCard({
           <input
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
           />
         </div>
         <button
           onClick={async () => { setSaving(true); await onSave(rate.id, value, desc); setSaving(false); }}
           disabled={saving}
-          className="flex items-center gap-2 bg-[#FF6500] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+          className="flex items-center gap-2 bg-[#D99A12] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
           {saving ? "Enregistrement..." : "Enregistrer"}
@@ -136,7 +136,7 @@ function ShippingRateCard({
               type="number"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value))}
-              className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+              className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
             />
           </div>
         )}
@@ -147,7 +147,7 @@ function ShippingRateCard({
               type="number"
               value={percentage}
               onChange={(e) => setPercentage(Number(e.target.value))}
-              className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+              className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
             />
           </div>
         )}
@@ -156,7 +156,7 @@ function ShippingRateCard({
           <input
             value={delivery}
             onChange={(e) => setDelivery(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
           />
         </div>
         <div>
@@ -164,7 +164,7 @@ function ShippingRateCard({
           <input
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+            className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
           />
         </div>
         <button
@@ -179,7 +179,7 @@ function ShippingRateCard({
             setSaving(false);
           }}
           disabled={saving}
-          className="flex items-center gap-2 bg-[#FF6500] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+          className="flex items-center gap-2 bg-[#D99A12] text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
           {saving ? "Enregistrement..." : "Enregistrer"}

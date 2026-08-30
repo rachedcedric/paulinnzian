@@ -19,7 +19,7 @@ export default async function ContactPage() {
       <div className="bg-black text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl sm:text-5xl font-black mb-4">
-            NOUS <span className="text-[#FF6500]">CONTACTER</span>
+            NOUS <span className="text-[#D99A12]">CONTACTER</span>
           </h1>
           <p className="text-gray-400 text-lg">
             Disponible 7j/7. Réponse rapide sur WhatsApp.
@@ -33,13 +33,13 @@ export default async function ContactPage() {
           <div className="bg-black rounded-3xl p-8 lg:p-10 text-white">
             <div className="mb-8">
               <h2 className="text-2xl font-black text-white mb-1">{settings.site_name || "Paulin N'ZIAN"}</h2>
-              <p className="text-[#FF6500] font-semibold">Personal Shopper</p>
+              <p className="text-[#D99A12] font-semibold">Personal Shopper</p>
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#FF6500]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#FF6500]" />
+                <div className="w-10 h-10 bg-[#D99A12]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-[#D99A12]" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Paris</p>
@@ -48,8 +48,8 @@ export default async function ContactPage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#FF6500]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#FF6500]" />
+                <div className="w-10 h-10 bg-[#D99A12]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-[#D99A12]" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Abidjan</p>

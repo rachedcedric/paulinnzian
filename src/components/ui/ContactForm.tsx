@@ -44,7 +44,7 @@ export function ContactForm() {
           id="contact-name"
           {...register("name")}
           placeholder="Votre nom complet"
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] focus:border-transparent transition-all"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] focus:border-transparent transition-all"
         />
         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
       </div>
@@ -58,7 +58,7 @@ export function ContactForm() {
           {...register("phone")}
           type="tel"
           placeholder="+225 07 XX XX XX XX"
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] focus:border-transparent transition-all"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] focus:border-transparent transition-all"
         />
         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
       </div>
@@ -72,7 +72,7 @@ export function ContactForm() {
           {...register("email")}
           type="email"
           placeholder="votre@email.com"
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] focus:border-transparent transition-all"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] focus:border-transparent transition-all"
         />
         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
       </div>
@@ -85,7 +85,7 @@ export function ContactForm() {
           id="contact-subject"
           {...register("subject")}
           placeholder="L'objet de votre message"
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] focus:border-transparent transition-all"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] focus:border-transparent transition-all"
         />
         {errors.subject && <p className="text-red-500 text-xs mt-1">{errors.subject.message}</p>}
       </div>
@@ -99,7 +99,7 @@ export function ContactForm() {
           {...register("message")}
           rows={5}
           placeholder="Décrivez votre demande..."
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] focus:border-transparent transition-all resize-none"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] focus:border-transparent transition-all resize-none"
         />
         {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>}
       </div>
@@ -107,7 +107,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full flex items-center justify-center gap-2 bg-[#FF6500] hover:bg-[#e55a00] disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all"
+        className="w-full flex items-center justify-center gap-2 bg-[#D99A12] hover:bg-[#C8912D] disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all"
       >
         <Send className="w-5 h-5" />
         {isSubmitting ? "Envoi en cours..." : "Envoyer"}

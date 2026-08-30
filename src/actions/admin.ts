@@ -44,12 +44,18 @@ const SITE_SETTING_KEYS = new Set([
   "address_paris", "address_abidjan", "facebook_url", "instagram_url", "tiktok_url", "hero_title",
   "hero_subtitle", "meta_description", "facebook_pixel_id", "google_ads_id",
   "google_analytics_id", "tiktok_pixel_id",
+  "announcement_enabled", "announcement_text", "announcement_link", "announcement_date",
+  "hero_eyebrow", "hero_title_before", "hero_title_highlight", "hero_title_after",
+  "hero_tagline", "hero_subtitle_text", "hero_cta_primary", "hero_cta_secondary", "hero_image",
 ]);
 const SETTING_URL_HOSTS: Record<string, readonly string[]> = {
   whatsapp_link: ["wa.me", "api.whatsapp.com"],
   facebook_url: ["facebook.com", "www.facebook.com"],
   instagram_url: ["instagram.com", "www.instagram.com"],
   tiktok_url: ["tiktok.com", "www.tiktok.com"],
+};
+const SETTING_MAX_LENGTH: Record<string, number> = {
+  hero_image: 8_000_000,
 };
 
 function validateSiteSettings(data: unknown) {
@@ -59,7 +65,8 @@ function validateSiteSettings(data: unknown) {
 
   const settings: Record<string, string> = {};
   for (const [key, rawValue] of entries) {
-    if (!SITE_SETTING_KEYS.has(key) || typeof rawValue !== "string" || rawValue.length > 1_000) return null;
+    const maxLength = SETTING_MAX_LENGTH[key] ?? 1_000;
+    if (!SITE_SETTING_KEYS.has(key) || typeof rawValue !== "string" || rawValue.length > maxLength) return null;
     const value = rawValue.trim();
     const allowedHosts = SETTING_URL_HOSTS[key];
     if (value && allowedHosts) {

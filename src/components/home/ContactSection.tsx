@@ -17,7 +17,7 @@ export function ContactSection() {
           className="mb-10 text-center sm:mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
-            NOUS <span className="text-[#FF6500]">CONTACTER</span>
+            NOUS <span className="text-[#D99A12]">CONTACTER</span>
           </h2>
           <p className="text-gray-600">Disponible 7j/7 pour répondre à vos questions.</p>
         </motion.div>
@@ -32,13 +32,13 @@ export function ContactSection() {
           >
             <div className="mb-8">
               <h3 className="text-2xl font-black text-white mb-1">{siteName}</h3>
-              <p className="text-[#FF6500] font-semibold">Personal Shopper</p>
+              <p className="text-[#D99A12] font-semibold">Personal Shopper</p>
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#FF6500]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#FF6500]" />
+                <div className="w-10 h-10 bg-[#D99A12]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-[#D99A12]" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Paris</p>
@@ -47,8 +47,8 @@ export function ContactSection() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#FF6500]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#FF6500]" />
+                <div className="w-10 h-10 bg-[#D99A12]/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-[#D99A12]" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Abidjan</p>

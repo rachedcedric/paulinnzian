@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
 
   const statCards = [
     { label: "Commandes totales", value: stats.totalOrders, icon: Package, color: "text-blue-600 bg-blue-50" },
-    { label: "Commandes en cours", value: stats.activeOrders, icon: TrendingUp, color: "text-orange-600 bg-orange-50" },
+    { label: "Commandes en cours", value: stats.activeOrders, icon: TrendingUp, color: "text-[#D99A12] bg-[#D99A12]/10" },
     { label: "Commandes livrées", value: stats.deliveredOrders, icon: Package, color: "text-green-600 bg-green-50" },
     { label: "Boutiques actives", value: stats.activeStores, icon: Store, color: "text-purple-600 bg-purple-50" },
     { label: "Messages non lus", value: stats.unreadMessages, icon: MessageSquare, color: "text-red-600 bg-red-50" },
@@ -58,7 +58,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-black text-black">Dernières commandes</h2>
-            <Link href="/admin/commandes" className="text-sm text-[#FF6500] hover:underline">
+            <Link href="/admin/commandes" className="text-sm text-[#D99A12] hover:underline">
               Voir tout
             </Link>
           </div>
@@ -88,7 +88,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-black text-black">Derniers messages</h2>
-            <Link href="/admin/messages" className="text-sm text-[#FF6500] hover:underline">
+            <Link href="/admin/messages" className="text-sm text-[#D99A12] hover:underline">
               Voir tout
             </Link>
           </div>
@@ -100,7 +100,7 @@ export default async function AdminDashboardPage() {
                 <div key={msg.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                   <div className="flex items-center gap-2">
                     {msg.status === "UNREAD" && (
-                      <div className="w-2 h-2 bg-[#FF6500] rounded-full flex-shrink-0" />
+                      <div className="w-2 h-2 bg-[#D99A12] rounded-full flex-shrink-0" />
                     )}
                     <div>
                       <p className="font-semibold text-sm text-black">{msg.name}</p>

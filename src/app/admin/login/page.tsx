@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-[#FF6500] rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#D99A12] rounded-xl flex items-center justify-center">
               <ShoppingBag className="w-6 h-6 text-white" />
             </div>
             <div className="text-left">
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
                 type="email"
                 placeholder="admin@mrshein.fr"
                 autoComplete="email"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500]"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12]"
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF6500] pr-12"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12] pr-12"
                 />
                 <button
                   type="button"
@@ -110,7 +110,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#FF6500] hover:bg-[#e55a00] disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all"
+              className="w-full bg-[#D99A12] hover:bg-[#C8912D] disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-all"
             >
               {loading ? "Connexion..." : "Se connecter"}
             </button>

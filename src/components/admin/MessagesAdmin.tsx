@@ -45,12 +45,12 @@ export function MessagesAdmin({ initialData }: { initialData: ContactMessage[] }
               <div
                 key={msg.id}
                 onClick={() => { setSelected(msg); if (msg.status === "UNREAD") handleRead(msg.id); }}
-                className={`p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${selected?.id === msg.id ? "bg-orange-50" : ""}`}
+                className={`p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${selected?.id === msg.id ? "bg-[#D99A12]/10" : ""}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2">
                     {msg.status === "UNREAD" ? (
-                      <Mail className="w-4 h-4 text-[#FF6500] mt-0.5 flex-shrink-0" />
+                      <Mail className="w-4 h-4 text-[#D99A12] mt-0.5 flex-shrink-0" />
                     ) : (
                       <MailOpen className="w-4 h-4 text-gray-300 mt-0.5 flex-shrink-0" />
                     )}

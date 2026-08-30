@@ -80,7 +80,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Rechercher un client..."
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
           />
         </div>
       </div>
@@ -112,7 +112,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
                     </td>
                     <td className="px-5 py-4 text-gray-700">{client.phone}</td>
                     <td className="px-5 py-4">
-                      <span className="inline-flex px-2.5 py-1 rounded-full bg-orange-50 text-[#FF6500] text-xs font-bold">
+                      <span className="inline-flex px-2.5 py-1 rounded-full bg-[#D99A12]/10 text-[#D99A12] text-xs font-bold">
                         {client.orderCount}
                       </span>
                     </td>
@@ -134,7 +134,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
                           onClick={() => openEdit(client)}
                           aria-label={`Modifier ${client.name}`}
                           title="Modifier"
-                          className="inline-flex w-9 h-9 items-center justify-center rounded-lg bg-orange-50 text-[#FF6500] hover:bg-orange-100"
+                          className="inline-flex w-9 h-9 items-center justify-center rounded-lg bg-[#D99A12]/10 text-[#D99A12] hover:bg-[#D99A12]/15"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
@@ -174,7 +174,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
                   minLength={2}
                   value={form.name}
                   onChange={(event) => setForm({ ...form, name: event.target.value })}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                 />
               </div>
               <div>
@@ -184,7 +184,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
                   minLength={8}
                   value={form.phone}
                   onChange={(event) => setForm({ ...form, phone: event.target.value })}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                 />
               </div>
               <div>
@@ -193,7 +193,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
                   type="email"
                   value={form.email}
                   onChange={(event) => setForm({ ...form, email: event.target.value })}
-                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+                  className="w-full px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
                 />
               </div>
               <div className="flex gap-3 pt-2">
@@ -207,7 +207,7 @@ export function ClientsAdmin({ initialClients }: { initialClients: Client[] }) {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 bg-[#FF6500] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
+                  className="flex-1 bg-[#D99A12] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50"
                 >
                   {isSaving ? "Enregistrement..." : "Enregistrer"}
                 </button>

@@ -9,7 +9,7 @@ export function CookieSettingsButton() {
   };
 
   return (
-    <button type="button" onClick={reopenSettings} className="rounded-lg bg-black px-5 py-3 font-bold text-white hover:bg-[#FF6500]">
+    <button type="button" onClick={reopenSettings} className="rounded-lg bg-black px-5 py-3 font-bold text-white hover:bg-[#D99A12]">
       Modifier mon choix
     </button>
   );

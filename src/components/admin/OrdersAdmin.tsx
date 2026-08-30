@@ -88,11 +88,11 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
             placeholder="Rechercher..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none"
+            className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
           />
           <button
             onClick={() => { setEditing(null); reset({ status: "PENDING", destinationCountry: "Côte d'Ivoire", destinationCity: "Abidjan", orderDate: formatDateInput() }); setShowForm(true); }}
-            className="flex items-center gap-2 bg-[#FF6500] text-white px-5 py-2.5 rounded-xl font-semibold"
+            className="flex items-center gap-2 bg-[#D99A12] text-white px-5 py-2.5 rounded-xl font-semibold"
           >
             <Plus className="w-5 h-5" />Créer
           </button>
@@ -110,50 +110,50 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Numéro de suivi *</label>
-                  <input {...register("trackingNumber")} placeholder="PNZ-2026-001245" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" />
+                  <input {...register("trackingNumber")} placeholder="PNZ-2026-001245" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" />
                   {errors.trackingNumber && <p className="text-red-500 text-xs">{errors.trackingNumber.message}</p>}</div>
                 <div><label className="block text-xs font-semibold mb-1">Statut *</label>
-                  <select {...register("status")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none">
+                  <select {...register("status")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none">
                     {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Nom client *</label>
-                  <input {...register("customerName")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("customerName")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Téléphone *</label>
-                  <input {...register("customerPhone")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("customerPhone")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Email</label>
-                  <input {...register("customerEmail")} type="email" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("customerEmail")} type="email" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Boutique</label>
-                  <input {...register("storeName")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("storeName")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Numéro commande boutique</label>
-                  <input {...register("storeOrderNumber")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("storeOrderNumber")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Date de commande</label>
-                  <input {...register("orderDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("orderDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Montant (FCFA)</label>
-                  <input {...register("amount")} type="number" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("amount")} type="number" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Nb colis</label>
-                  <input {...register("packageCount")} type="number" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("packageCount")} type="number" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Poids (kg) <span className="font-normal text-gray-400">(facultatif, renseigné à l'arrivée)</span></label>
-                  <input {...register("weight")} type="number" step="0.1" placeholder="ex: 1.3" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("weight")} type="number" step="0.1" placeholder="ex: 1.3" className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-semibold mb-1">Ville destination *</label>
-                  <input {...register("destinationCity")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("destinationCity")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                 <div><label className="block text-xs font-semibold mb-1">Pays *</label>
-                  <input {...register("destinationCountry")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                  <input {...register("destinationCountry")} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
               </div>
               <div><label className="block text-xs font-semibold mb-1">Notes internes</label>
-                <textarea {...register("internalNotes")} rows={2} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#FF6500] focus:outline-none resize-none" /></div>
+                <textarea {...register("internalNotes")} rows={2} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none resize-none" /></div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setShowForm(false)} className="flex-1 px-4 py-2.5 border rounded-xl text-sm font-semibold">Annuler</button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 bg-[#FF6500] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">
+                <button type="submit" disabled={isSubmitting} className="flex-1 bg-[#D99A12] text-white px-4 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50">
                   {isSubmitting ? "..." : "Enregistrer"}
                 </button>
               </div>
@@ -168,7 +168,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
           <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <div>
-                <h2 className="font-black text-[#FF6500]">{viewOrder.trackingNumber}</h2>
+                <h2 className="font-black text-[#D99A12]">{viewOrder.trackingNumber}</h2>
                 <p className="text-sm text-gray-500">{viewOrder.customerName} • {viewOrder.destinationCity}</p>
               </div>
               <button onClick={() => setViewOrder(null)}><X className="w-5 h-5" /></button>
@@ -178,7 +178,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
             <div className="mb-5">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-bold">Événements de suivi</h3>
-                <button onClick={() => { resetEvent({ orderId: viewOrder.id, status: "PENDING", title: "", eventDate: formatDateInput(), displayOrder: 0 }); setShowEventForm(true); }} className="flex items-center gap-1 text-sm text-[#FF6500] font-semibold">
+                <button onClick={() => { resetEvent({ orderId: viewOrder.id, status: "PENDING", title: "", eventDate: formatDateInput(), displayOrder: 0 }); setShowEventForm(true); }} className="flex items-center gap-1 text-sm text-[#D99A12] font-semibold">
                   <PlusCircle className="w-4 h-4" />Ajouter
                 </button>
               </div>
@@ -187,24 +187,24 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
                 <form onSubmit={handleEvent(onAddEvent)} className="bg-gray-50 rounded-xl p-4 mb-4 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className="block text-xs font-semibold mb-1">Statut *</label>
-                      <select {...regEvent("status")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none">
+                      <select {...regEvent("status")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none">
                         {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                       </select></div>
                     <div><label className="block text-xs font-semibold mb-1">Date *</label>
-                      <input {...regEvent("eventDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" />
+                      <input {...regEvent("eventDate")} type="date" className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none" />
                       {eventErrors.eventDate && <p className="mt-1 text-xs text-red-500">Date invalide</p>}</div>
                   </div>
                   <div><label className="block text-xs font-semibold mb-1">Titre *</label>
-                    <input {...regEvent("title")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                    <input {...regEvent("title")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className="block text-xs font-semibold mb-1">Localisation</label>
-                      <input {...regEvent("location")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                      <input {...regEvent("location")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                     <div><label className="block text-xs font-semibold mb-1">Commentaire</label>
-                      <input {...regEvent("description")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#FF6500] focus:outline-none" /></div>
+                      <input {...regEvent("description")} className="w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none" /></div>
                   </div>
                   <div className="flex gap-2">
                     <button type="button" onClick={() => setShowEventForm(false)} className="px-3 py-1.5 border rounded-lg text-xs">Annuler</button>
-                    <button type="submit" disabled={eventSubmitting} className="px-3 py-1.5 bg-[#FF6500] text-white rounded-lg text-xs disabled:opacity-50">
+                    <button type="submit" disabled={eventSubmitting} className="px-3 py-1.5 bg-[#D99A12] text-white rounded-lg text-xs disabled:opacity-50">
                       {eventSubmitting ? "..." : "Ajouter"}
                     </button>
                   </div>
@@ -253,7 +253,7 @@ export function OrdersAdmin({ initialOrders }: { initialOrders: Order[] }) {
             <tbody>
               {filtered.map((order) => (
                 <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono text-sm text-[#FF6500] font-bold">{order.trackingNumber}</td>
+                  <td className="px-4 py-3 font-mono text-sm text-[#D99A12] font-bold">{order.trackingNumber}</td>
                   <td className="px-4 py-3">
                     <p className="font-semibold text-black">{order.customerName}</p>
                     <p className="text-xs text-gray-400">{order.customerPhone}</p>
