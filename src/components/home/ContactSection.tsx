@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { MapPin, MessageCircle, Phone } from "lucide-react";
-import { ContactForm } from "@/components/ui/ContactForm";
 import { useSiteConfig } from "@/components/layout/SiteConfigContext";
 
 export function ContactSection() {
@@ -22,7 +21,7 @@ export function ContactSection() {
           <p className="text-gray-600">Disponible 7j/7 pour répondre à vos questions.</p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-10">
+        <div className="max-w-xl mx-auto">
           {/* Contact Info */}
           <motion.div
             initial={false}
@@ -90,15 +89,6 @@ export function ContactSection() {
                 CONTACTER SUR WHATSAPP
               </a>
             </div>
-          </motion.div>
-
-          {/* Contact Form */}
-          <motion.div
-            initial={false}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <ContactForm />
           </motion.div>
         </div>
       </div>
