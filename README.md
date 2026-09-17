@@ -6,7 +6,7 @@ Plateforme Full Stack professionnelle pour l'activité de Personal Shopper de Pa
 
 - **Frontend** : Next.js 16, TypeScript, Tailwind CSS, Framer Motion, Lucide Icons
 - **Backend** : Next.js Server Actions
-- **Base de données** : PostgreSQL + Prisma ORM
+- **Base de données** : MySQL/MariaDB + Prisma ORM
 - **Authentification** : NextAuth / Auth.js (JWT)
 - **Validation** : Zod + React Hook Form
 - **Notifications** : Sonner (toasts)
@@ -22,13 +22,13 @@ cp .env.example .env
 # Éditez .env avec vos vraies valeurs
 ```
 
-## Configuration PostgreSQL
+## Configuration MySQL
 
-```sql
-CREATE DATABASE mrshein;
+Créez une base et un utilisateur MySQL, puis renseignez `DATABASE_URL` dans `.env` :
+
+```dotenv
+DATABASE_URL="mysql://USER:PASSWORD@HOST:3306/DATABASE?connectionLimit=1&connectTimeout=10000"
 ```
-
-Mettez votre DATABASE_URL dans .env.
 
 ## Migration et seed
 
@@ -89,7 +89,7 @@ npm start
 
 | Variable | Description |
 |----------|-------------|
-| DATABASE_URL | URL PostgreSQL |
+| DATABASE_URL | URL MySQL/MariaDB |
 | AUTH_SECRET | Clé secrète NextAuth (min 32 chars) |
 | NEXTAUTH_URL | URL complète de l'app |
 | NEXT_PUBLIC_APP_URL | URL publique |

@@ -8,7 +8,7 @@ import { FAQSection } from "@/components/home/FAQSection";
 import { ContactSection } from "@/components/home/ContactSection";
 import { getTestimonials, getFAQs, getStores, getShippingRates } from "@/actions/public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function HomePage() {
   const [testimonials, faqs, stores, shippingRates] = await Promise.all([

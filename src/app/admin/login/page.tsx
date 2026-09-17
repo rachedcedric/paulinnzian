@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "@/lib/validations";
 import { useState } from "react";
-import { ShoppingBag, Eye, EyeOff, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
@@ -46,11 +46,11 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-[#D99A12] rounded-xl flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-white" />
+            <div className="relative w-12 h-12 rounded-full bg-black border-2 border-[#D99A12] flex items-center justify-center shrink-0">
+              <span className="text-white font-black text-sm tracking-tight">PN</span>
             </div>
             <div className="text-left">
-              <p className="font-black text-white text-lg">MR SHEIN</p>
+              <p className="font-black text-white text-lg">PAULIN N&apos;ZIAN</p>
               <p className="text-gray-400 text-xs">Administration</p>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
                 id="admin-email"
                 {...register("email")}
                 type="email"
-                placeholder="admin@mrshein.fr"
+                placeholder="votre@email.com"
                 autoComplete="email"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D99A12]"
               />

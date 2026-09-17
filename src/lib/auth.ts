@@ -22,40 +22,66 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        if (!parsed.success) {
+          console.warn("[admin-auth] INVALID_INPUT");
+          return null;
+        }
 
         const { email, password } = parsed.data;
         const { prisma } = await import("@/lib/db");
-        const user = await prisma.adminUser.findUnique({ where: { email } });
+
+        let user;
+        try {
+          user = await prisma.adminUser.findUnique({ where: { email } });
+        } catch (err) {
+          console.error("[admin-auth] DATABASE_ERROR", err instanceof Error ? err.message : err);
+          return null;
+        }
+
         if (!user) {
           await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
+          console.warn("[admin-auth] USER_NOT_FOUND");
           return null;
         }
 
         const now = new Date();
-        if (user.lockedUntil && user.lockedUntil > now) return null;
+        if (user.lockedUntil && user.lockedUntil > now) {
+          console.warn("[admin-auth] ACCOUNT_LOCKED", { userId: user.id });
+          return null;
+        }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
           const failedLoginAttempts = user.failedLoginAttempts + 1;
-          await prisma.adminUser.update({
-            where: { id: user.id },
-            data: {
-              failedLoginAttempts,
-              lockedUntil: failedLoginAttempts >= MAX_LOGIN_ATTEMPTS
-                ? new Date(now.getTime() + LOCK_DURATION_MS)
-                : null,
-            },
-          });
+          try {
+            await prisma.adminUser.update({
+              where: { id: user.id },
+              data: {
+                failedLoginAttempts,
+                lockedUntil: failedLoginAttempts >= MAX_LOGIN_ATTEMPTS
+                  ? new Date(now.getTime() + LOCK_DURATION_MS)
+                  : null,
+              },
+            });
+          } catch (err) {
+            console.error("[admin-auth] DATABASE_ERROR_ON_LOCKOUT_UPDATE", err instanceof Error ? err.message : err);
+          }
+          console.warn("[admin-auth] PASSWORD_VERIFY_FAILED", { userId: user.id, failedLoginAttempts });
           return null;
         }
 
         if (user.failedLoginAttempts || user.lockedUntil) {
-          await prisma.adminUser.update({
-            where: { id: user.id },
-            data: { failedLoginAttempts: 0, lockedUntil: null },
-          });
+          try {
+            await prisma.adminUser.update({
+              where: { id: user.id },
+              data: { failedLoginAttempts: 0, lockedUntil: null },
+            });
+          } catch (err) {
+            console.error("[admin-auth] DATABASE_ERROR_ON_RESET_UPDATE", err instanceof Error ? err.message : err);
+          }
         }
+
+        console.info("[admin-auth] LOGIN_SUCCESS", { userId: user.id });
 
         return {
           id: user.id,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { StoresClient } from "./StoresClient";
 import { getStores } from "@/actions/public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Boutiques en ligne",

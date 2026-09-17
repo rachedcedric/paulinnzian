@@ -3,7 +3,7 @@ import { MapPin, MessageCircle, Phone } from "lucide-react";
 import { ContactForm } from "@/components/ui/ContactForm";
 import { getSiteSettings } from "@/actions/public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Contact",

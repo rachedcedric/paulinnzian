@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, Store, DollarSign, Star, HelpCircle,
-  MessageSquare, Settings, LogOut, ShoppingBag, Menu, X, Users,
+  MessageSquare, Settings, LogOut, Menu, X, Users,
   UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -58,11 +58,11 @@ export function AdminSidebar({ role }: { role?: string }) {
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <Link href="/admin" className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#D99A12] rounded-lg flex items-center justify-center">
-                <ShoppingBag className="w-5 h-5 text-white" />
+              <div className="relative w-9 h-9 rounded-full bg-black border-2 border-[#D99A12] flex items-center justify-center shrink-0">
+                <span className="text-white font-black text-[10px] tracking-tight">PN</span>
               </div>
               <div>
-                <p className="font-black text-white text-sm">MR SHEIN</p>
+                <p className="font-black text-white text-sm">PAULIN N&apos;ZIAN</p>
                 <p className="text-xs text-gray-500">Administration</p>
               </div>
             </Link>

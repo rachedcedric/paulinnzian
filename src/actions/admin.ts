@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { invalidateSiteSettingsCache } from "@/lib/site-settings";
 import {
   storeSchema,
   orderSchema,
@@ -411,7 +412,10 @@ export async function updateSiteSettings(data: Record<string, string>) {
       create: { key, value },
     });
   }
-  revalidatePath("/");
+  // Site settings feed the root layout (header/footer/announcement bar) on every
+  // route, so bust the shared layout cache, not just the homepage.
+  invalidateSiteSettingsCache();
+  revalidatePath("/", "layout");
   revalidatePath("/admin/parametres");
   return { success: true };
 }
@@ -614,15 +618,15 @@ export async function adminGetOrders(filters?: {
       ...(filters?.search
         ? {
             OR: [
-              { trackingNumber: { contains: filters.search, mode: "insensitive" } },
-              { customerName: { contains: filters.search, mode: "insensitive" } },
-              { customerPhone: { contains: filters.search, mode: "insensitive" } },
-              { storeOrderNumber: { contains: filters.search, mode: "insensitive" } },
+              { trackingNumber: { contains: filters.search } },
+              { customerName: { contains: filters.search } },
+              { customerPhone: { contains: filters.search } },
+              { storeOrderNumber: { contains: filters.search } },
             ],
           }
         : {}),
       ...(filters?.status ? { status: filters.status as z.infer<typeof orderSchema>["status"] } : {}),
-      ...(filters?.destination ? { destinationCity: { contains: filters.destination, mode: "insensitive" } } : {}),
+      ...(filters?.destination ? { destinationCity: { contains: filters.destination } } : {}),
     },
     orderBy: { createdAt: "desc" },
     include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },

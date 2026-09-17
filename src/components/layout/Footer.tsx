@@ -30,7 +30,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <Image src="/logo.png" alt="MR SHEIN" width={56} height={56} className="rounded-full" />
+              <Image src="/logo.png" alt={siteName} width={56} height={56} className="rounded-full" />
             </div>
             <p className="text-sm text-gray-400 mb-4">
               {siteName} — {siteSlogan}

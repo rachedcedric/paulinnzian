@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { contactSchema, trackingLookupSchema } from "@/lib/validations";
 import { consumeRateLimit, getRequestFingerprint } from "@/lib/rate-limit";
+import { getCachedSiteSettings } from "@/lib/site-settings";
 import { revalidatePath } from "next/cache";
 
 export async function submitContactForm(formData: unknown) {
@@ -41,7 +42,7 @@ export async function getStores(category?: string, search?: string) {
         isActive: true,
         ...(category && category !== "Tous" ? { category } : {}),
         ...(search
-          ? { name: { contains: search, mode: "insensitive" } }
+          ? { name: { contains: search } }
           : {}),
       },
       orderBy: { displayOrder: "asc" },
@@ -97,8 +98,7 @@ export async function getFAQs() {
 
 export async function getSiteSettings() {
   try {
-    const settings = await prisma.siteSetting.findMany();
-    return Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
+    return await getCachedSiteSettings();
   } catch {
     return {};
   }

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
 }
 
 enum Role {
@@ -35,9 +35,9 @@ enum MessageStatus {
 
 model AdminUser {
   id                  String    @id @default(cuid())
-  email               String    @unique
-  password            String
-  name                String
+  email               String    @unique @db.VarChar(254)
+  password            String    @db.VarChar(100)
+  name                String    @db.VarChar(100)
   role                Role      @default(ADMIN)
   failedLoginAttempts Int       @default(0)
   lockedUntil         DateTime?
@@ -49,12 +49,12 @@ model AdminUser {
 
 model Store {
   id           String   @id @default(cuid())
-  name         String
-  slug         String   @unique
-  logo         String?
-  websiteUrl   String
-  category     String
-  description  String?
+  name         String   @db.VarChar(100)
+  slug         String   @unique @db.VarChar(100)
+  logo         String?  @db.LongText
+  websiteUrl   String   @db.VarChar(2048)
+  category     String   @db.VarChar(80)
+  description  String?  @db.Text
   isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
@@ -65,11 +65,11 @@ model Store {
 
 model ExchangeRate {
   id           String   @id @default(cuid())
-  name         String
+  name         String   @db.VarChar(150)
   rate         Float
-  currencyFrom String   @default("EUR")
-  currencyTo   String   @default("XOF")
-  description  String?
+  currencyFrom String   @default("EUR") @db.VarChar(10)
+  currencyTo   String   @default("XOF") @db.VarChar(10)
+  description  String?  @db.Text
   isActive     Boolean  @default(true)
   updatedAt    DateTime @updatedAt
   createdAt    DateTime @default(now())
@@ -79,12 +79,12 @@ model ExchangeRate {
 
 model ShippingRate {
   id                String      @id @default(cuid())
-  name              String
+  name              String      @db.VarChar(100)
   pricingType       PricingType
   price             Float?
   percentage        Float?
-  description       String?
-  estimatedDelivery String?
+  description       String?     @db.Text
+  estimatedDelivery String?     @db.VarChar(100)
   isActive          Boolean     @default(true)
   displayOrder      Int         @default(0)
   createdAt         DateTime    @default(now())
@@ -95,18 +95,18 @@ model ShippingRate {
 
 model Order {
   id                 String          @id @default(cuid())
-  trackingNumber     String          @unique
-  customerName       String
-  customerPhone      String
-  customerEmail      String?
-  storeName          String?
-  storeOrderNumber   String?
+  trackingNumber     String          @unique @db.VarChar(100)
+  customerName       String          @db.VarChar(100)
+  customerPhone      String          @db.VarChar(30)
+  customerEmail      String?         @db.VarChar(254)
+  storeName          String?         @db.VarChar(100)
+  storeOrderNumber   String?         @db.VarChar(100)
   amount             Float?
   packageCount       Int?
   weight             Float?
-  destinationCity    String
-  destinationCountry String
-  internalNotes      String?
+  destinationCity    String          @db.VarChar(100)
+  destinationCountry String          @db.VarChar(100)
+  internalNotes      String?         @db.Text
   status             OrderStatus     @default(PENDING)
   orderDate          DateTime        @default(now())
   trackingEvents     TrackingEvent[]
@@ -118,9 +118,9 @@ model Order {
 
 model Client {
   id        String   @id @default(cuid())
-  name      String
-  phone     String   @unique
-  email     String?
+  name      String   @db.VarChar(150)
+  phone     String   @unique @db.VarChar(30)
+  email     String?  @db.VarChar(254)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -132,9 +132,9 @@ model TrackingEvent {
   orderId      String
   order        Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
   status       OrderStatus
-  title        String
-  description  String?
-  location     String?
+  title        String      @db.VarChar(150)
+  description  String?     @db.Text
+  location     String?     @db.VarChar(150)
   eventDate    DateTime
   displayOrder Int         @default(0)
   createdAt    DateTime    @default(now())
@@ -144,10 +144,10 @@ model TrackingEvent {
 
 model Testimonial {
   id           String   @id @default(cuid())
-  name         String
-  photo        String?
+  name         String   @db.VarChar(100)
+  photo        String?  @db.VarChar(2048)
   rating       Int      @default(5)
-  comment      String
+  comment      String   @db.Text
   isPublished  Boolean  @default(true)
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
@@ -158,8 +158,8 @@ model Testimonial {
 
 model FAQ {
   id           String   @id @default(cuid())
-  question     String
-  answer       String
+  question     String   @db.VarChar(300)
+  answer       String   @db.Text
   isPublished  Boolean  @default(true)
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
@@ -170,11 +170,11 @@ model FAQ {
 
 model ContactMessage {
   id        String        @id @default(cuid())
-  name      String
-  phone     String
-  email     String?
-  subject   String
-  message   String
+  name      String        @db.VarChar(100)
+  phone     String        @db.VarChar(30)
+  email     String?       @db.VarChar(254)
+  subject   String        @db.VarChar(150)
+  message   String        @db.Text
   status    MessageStatus @default(UNREAD)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -184,8 +184,8 @@ model ContactMessage {
 
 model SiteSetting {
   id        String   @id @default(cuid())
-  key       String   @unique
-  value     String
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.LongText
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 
@@ -193,7 +193,7 @@ model SiteSetting {
 }
 
 model PublicRateLimit {
-  key       String   @id
+  key       String   @id @db.VarChar(191)
   attempts  Int      @default(1)
   expiresAt DateTime
   updatedAt DateTime @updatedAt

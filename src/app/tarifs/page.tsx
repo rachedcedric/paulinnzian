@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getShippingRates } from "@/actions/public";
 import { PricingClient } from "./PricingClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Tarifs",

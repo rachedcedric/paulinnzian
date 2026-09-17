@@ -4,7 +4,7 @@ import {
 } from "lucide-react";
 import { getSiteSettings } from "@/actions/public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Comment ça marche",
