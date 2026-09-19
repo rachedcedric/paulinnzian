@@ -13,6 +13,17 @@ import {
   exchangeRateUpdateSchema,
   shippingRateUpdateSchema,
 } from "@/lib/validations";
+import {
+  ORDER_EXPORT_MAX_ROWS,
+  csvRow,
+  formatOrderDateTime,
+  nextDay,
+  parseOrderListParams,
+  zonedDayStart,
+  type OrderListParams,
+} from "@/lib/order-list";
+import { ORDER_STATUS_LABELS } from "@/types";
+import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -607,30 +618,119 @@ export async function getDashboardStats() {
 }
 
 // ─── ADMIN GETTERS ────────────────────────────────────────────────────────────
-export async function adminGetOrders(filters?: {
-  search?: string;
-  status?: string;
-  destination?: string;
-}) {
+function buildOrderWhere(params: OrderListParams): Prisma.OrderWhereInput {
+  const and: Prisma.OrderWhereInput[] = [];
+  if (params.search) {
+    and.push({
+      OR: [
+        { trackingNumber: { contains: params.search } },
+        { customerName: { contains: params.search } },
+        { customerPhone: { contains: params.search } },
+        { storeOrderNumber: { contains: params.search } },
+      ],
+    });
+  }
+  if (params.status) and.push({ status: params.status });
+  if (params.destination) and.push({ destinationCity: params.destination });
+  if (params.dateFrom || params.dateTo) {
+    and.push({
+      createdAt: {
+        ...(params.dateFrom ? { gte: zonedDayStart(params.dateFrom) } : {}),
+        ...(params.dateTo ? { lt: zonedDayStart(nextDay(params.dateTo)) } : {}),
+      },
+    });
+  }
+  return and.length ? { AND: and } : {};
+}
+
+function buildOrderSort(params: OrderListParams): Prisma.OrderOrderByWithRelationInput[] {
+  // "id" as tie-breaker keeps pagination stable when the sorted column has duplicates.
+  return [{ [params.sort]: params.order }, { id: params.order }];
+}
+
+export async function adminListOrders(rawParams: unknown) {
   await requireViewer();
-  return prisma.order.findMany({
-    where: {
-      ...(filters?.search
-        ? {
-            OR: [
-              { trackingNumber: { contains: filters.search } },
-              { customerName: { contains: filters.search } },
-              { customerPhone: { contains: filters.search } },
-              { storeOrderNumber: { contains: filters.search } },
-            ],
-          }
-        : {}),
-      ...(filters?.status ? { status: filters.status as z.infer<typeof orderSchema>["status"] } : {}),
-      ...(filters?.destination ? { destinationCity: { contains: filters.destination } } : {}),
+  const params = parseOrderListParams((rawParams ?? {}) as Record<string, unknown>);
+  const where = buildOrderWhere(params);
+
+  const total = await prisma.order.count({ where });
+  const totalPages = Math.max(1, Math.ceil(total / params.limit));
+  const page = Math.min(params.page, totalPages);
+
+  const [orders, totalOrders, delivered, phones, destinations] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      orderBy: buildOrderSort(params),
+      skip: (page - 1) * params.limit,
+      take: params.limit,
+      include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },
+    }),
+    prisma.order.count(),
+    prisma.order.count({ where: { status: "DELIVERED" } }),
+    prisma.order.groupBy({ by: ["customerPhone"] }),
+    prisma.order.groupBy({ by: ["destinationCity"], orderBy: { destinationCity: "asc" } }),
+  ]);
+
+  const uniqueClients = new Set(phones.map((p) => normalizePhone(p.customerPhone))).size;
+
+  return {
+    params: { ...params, page },
+    orders,
+    total,
+    totalPages,
+    stats: {
+      total: totalOrders,
+      inProgress: totalOrders - delivered,
+      delivered,
+      uniqueClients,
     },
-    orderBy: { createdAt: "desc" },
-    include: { trackingEvents: { orderBy: { displayOrder: "asc" } } },
+    destinations: destinations.map((d) => d.destinationCity).filter(Boolean),
+  };
+}
+
+export async function adminExportOrdersCsv(rawParams: unknown) {
+  await requireManager();
+  const params = parseOrderListParams((rawParams ?? {}) as Record<string, unknown>);
+
+  const orders = await prisma.order.findMany({
+    where: buildOrderWhere(params),
+    orderBy: buildOrderSort(params),
+    take: ORDER_EXPORT_MAX_ROWS + 1,
+    select: {
+      trackingNumber: true,
+      customerName: true,
+      customerPhone: true,
+      storeOrderNumber: true,
+      destinationCity: true,
+      destinationCountry: true,
+      status: true,
+      createdAt: true,
+      amount: true,
+      packageCount: true,
+      weight: true,
+    },
   });
+
+  const truncated = orders.length > ORDER_EXPORT_MAX_ROWS;
+  const rows = truncated ? orders.slice(0, ORDER_EXPORT_MAX_ROWS) : orders;
+
+  const lines = [
+    csvRow([
+      "N° Suivi", "Client", "Téléphone", "N° commande boutique", "Ville", "Pays",
+      "Statut", "Date", "Heure", "Montant (FCFA)", "Colis", "Poids (kg)",
+    ]),
+    ...rows.map((o) => {
+      const { date, time } = formatOrderDateTime(o.createdAt);
+      return csvRow([
+        o.trackingNumber, o.customerName, o.customerPhone, o.storeOrderNumber,
+        o.destinationCity, o.destinationCountry, ORDER_STATUS_LABELS[o.status] ?? o.status,
+        date, time, o.amount, o.packageCount, o.weight,
+      ]);
+    }),
+  ];
+
+  // The UTF-8 BOM (so Excel reads accents) is added by the client when building the file.
+  return { csv: lines.join("\r\n"), count: rows.length, truncated };
 }
 
 export async function adminGetClients() {

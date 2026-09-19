@@ -29,8 +29,14 @@ export const orderSchema = z.object({
   customerEmail: z.string().trim().email().max(254).optional().or(z.literal("")),
   storeName: z.string().trim().max(100).optional(),
   storeOrderNumber: z.string().trim().max(100).optional(),
-  amount: z.coerce.number().finite().positive().max(1_000_000_000).optional(),
-  packageCount: z.coerce.number().int().positive().max(10_000).optional(),
+  amount: z.preprocess(
+    (value) => value === "" || value === null ? undefined : value,
+    z.coerce.number().finite().positive().max(1_000_000_000).optional(),
+  ),
+  packageCount: z.preprocess(
+    (value) => value === "" || value === null ? undefined : value,
+    z.coerce.number().int().positive().max(10_000).optional(),
+  ),
   weight: z.preprocess(
     (value) => value === "" || value === null ? undefined : value,
     z.coerce.number().finite().positive().max(100_000).optional(),

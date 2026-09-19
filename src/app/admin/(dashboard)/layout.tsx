@@ -14,7 +14,7 @@ export default async function AdminDashboardLayout({
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar role={(session.user as { role?: string }).role} />
-      <div className="flex-1 lg:ml-64 min-h-screen">
+      <div className="flex-1 min-w-0 lg:ml-64 min-h-screen">
         {children}
       </div>
       <Toaster richColors position="top-right" />
