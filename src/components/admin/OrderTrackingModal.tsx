@@ -10,10 +10,22 @@ import { trackingEventSchema, type TrackingEventFormData } from "@/lib/validatio
 import { ORDER_STATUS_LABELS } from "@/types";
 import type { Order } from "@/types";
 import { formatDate, formatDateInput } from "@/lib/utils";
+import { countryFlag } from "@/lib/country-flag";
+import { OrderStatusBadge } from "./OrderStatusBadge";
 
 const STATUS_OPTIONS = Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({ value, label }));
 const input =
   "w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none";
+const numberFormat = new Intl.NumberFormat("fr-FR");
+
+function Detail({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="text-xs font-semibold text-gray-400">{label}</dt>
+      <dd className="mt-1 break-words text-sm font-medium text-gray-900">{value ?? "Non renseigné"}</dd>
+    </div>
+  );
+}
 
 interface Props {
   order: Order;
@@ -55,14 +67,44 @@ export function OrderTrackingModal({ order, canManage, onClose, onChanged }: Pro
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="order-details-title">
       <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="font-black text-[#D99A12]">{order.trackingNumber}</h2>
-            <p className="text-sm text-gray-500">{order.customerName} • {order.destinationCity}</p>
+            <p className="text-xs font-semibold uppercase text-gray-400">Détails de la commande</p>
+            <h2 id="order-details-title" className="font-mono text-lg font-black text-[#D99A12]">{order.trackingNumber}</h2>
           </div>
           <button onClick={onClose} aria-label="Fermer"><X className="w-5 h-5" /></button>
+        </div>
+
+        <div className="mb-6 space-y-5 border-y border-gray-100 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="font-bold text-gray-900">{order.customerName}</p>
+              <p className="text-sm text-gray-500">
+                <span aria-hidden>{countryFlag(order.destinationCountry)}</span> {order.destinationCity}, {order.destinationCountry}
+              </p>
+            </div>
+            <OrderStatusBadge status={order.status} />
+          </div>
+
+          <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Detail label="Téléphone" value={order.customerPhone} />
+            <Detail label="Email" value={order.customerEmail} />
+            <Detail label="Date de commande" value={formatDate(order.orderDate)} />
+            <Detail label="Boutique" value={order.storeName} />
+            <Detail label="N° commande boutique" value={order.storeOrderNumber} />
+            <Detail label="Montant" value={order.amount != null ? `${numberFormat.format(order.amount)} FCFA` : null} />
+            <Detail label="Nombre de colis" value={order.packageCount} />
+            <Detail label="Poids" value={order.weight != null ? `${numberFormat.format(order.weight)} kg` : null} />
+          </dl>
+
+          {order.internalNotes && (
+            <div>
+              <p className="text-xs font-semibold text-gray-400">Notes internes</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-gray-700">{order.internalNotes}</p>
+            </div>
+          )}
         </div>
 
         <div className="mb-5">

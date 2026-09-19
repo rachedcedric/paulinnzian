@@ -177,7 +177,7 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
 
   const actions = (order: Order) => (
     <div className="flex items-center justify-end gap-1">
-      <button onClick={() => setViewId(order.id)} className="rounded-lg p-2 hover:bg-gray-100" title="Voir / Suivi" aria-label="Voir / Suivi">
+      <button onClick={() => setViewId(order.id)} className="rounded-lg p-2 hover:bg-gray-100" title="Voir les détails" aria-label={`Voir les détails de la commande ${order.trackingNumber}`}>
         <Eye className="h-4 w-4 text-gray-500" />
       </button>
       {canManage && (
