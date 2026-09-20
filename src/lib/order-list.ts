@@ -161,6 +161,25 @@ export function nextDay(dateStr: string): string {
   return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
 }
 
+export function shiftDate(dateStr: string, days: number): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+export function dateInTimeZone(date = new Date(), timeZone = ORDERS_TIMEZONE): string {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .formatToParts(date)
+      .map((part) => [part.type, part.value]),
+  );
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
 export function formatOrderDateTime(value: Date | string) {
   const date = new Date(value);
   return {
@@ -176,6 +195,11 @@ export function formatOrderDateTime(value: Date | string) {
       minute: "2-digit",
     }).format(date),
   };
+}
+
+export function calculateWeightCharge(weight: number | null | undefined, rate: number) {
+  if (!weight || !Number.isFinite(weight) || weight <= 0 || !Number.isFinite(rate) || rate < 0) return 0;
+  return Math.ceil(weight) * rate;
 }
 
 // ─── CSV ────────────────────────────────────────────────────────────────────

@@ -5,11 +5,10 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, Store, DollarSign, Star, HelpCircle,
-  MessageSquare, Settings, LogOut, Menu, X, Users,
+  MessageSquare, Settings, LogOut, X, Users,
   UserCog,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -24,20 +23,21 @@ const navItems = [
   { href: "/admin/parametres", label: "Paramètres", icon: Settings, superAdminOnly: true },
 ];
 
-export function AdminSidebar({ role }: { role?: string }) {
+interface Props {
+  role?: string;
+  unreadMessages?: number;
+  collapsed: boolean;
+  mobileOpen: boolean;
+  onCloseMobile: () => void;
+}
+
+export function AdminSidebar({ role, unreadMessages = 0, collapsed, mobileOpen, onCloseMobile }: Props) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = mobileOpen;
+  const setIsOpen = (open: boolean) => { if (!open) onCloseMobile(); };
 
   return (
     <>
-      {/* Mobile toggle */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 w-10 h-10 bg-black rounded-lg flex items-center justify-center"
-      >
-        <Menu className="w-5 h-5 text-white" />
-      </button>
-
       {/* Overlay */}
       {isOpen && (
         <div
@@ -49,9 +49,9 @@ export function AdminSidebar({ role }: { role?: string }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 bottom-0 w-64 bg-black flex flex-col z-50 transition-transform duration-300",
-          "lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          "fixed left-0 top-0 bottom-0 w-64 bg-[#0B1018] flex flex-col z-50 transition-transform duration-300",
+          isOpen ? "translate-x-0" : "-translate-x-full",
+          !collapsed && "lg:translate-x-0"
         )}
       >
         {/* Logo */}
@@ -96,6 +96,11 @@ export function AdminSidebar({ role }: { role?: string }) {
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
                 {item.label}
+                {item.href === "/admin/messages" && unreadMessages > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white">
+                    {unreadMessages > 99 ? "99+" : unreadMessages}
+                  </span>
+                )}
               </Link>
             );
           })}

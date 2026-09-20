@@ -53,6 +53,7 @@ export interface Order {
   amount: number | null;
   packageCount: number | null;
   weight: number | null;
+  weightAddedAt: Date | null;
   destinationCity: string;
   destinationCountry: string;
   internalNotes: string | null;

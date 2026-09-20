@@ -4,6 +4,7 @@ import {
   entityIdSchema,
   exchangeRateUpdateSchema,
   orderSchema,
+  orderWeightSchema,
   shippingRateUpdateSchema,
   trackingEventSchema,
   trackingLookupSchema,
@@ -43,6 +44,21 @@ test("orders and tracking events require valid business dates", () => {
   assert.equal(orderSchema.parse(order).trackingNumber, "PNZ-2026-001");
   assert.equal(orderSchema.parse({ ...order, weight: "" }).weight, undefined);
   assert.equal(orderSchema.safeParse({ ...order, orderDate: "10/08/2026" }).success, false);
+  assert.equal(orderWeightSchema.parse({
+    orderId: "order-1",
+    weight: "1.3",
+    weightAddedAt: "2026-09-19",
+  }).weightAddedAt, "2026-09-19T12:00:00");
+  assert.equal(orderWeightSchema.safeParse({
+    orderId: "order-1",
+    weight: 0,
+    weightAddedAt: "2026-09-19",
+  }).success, false);
+  assert.equal(orderWeightSchema.safeParse({
+    orderId: "order-1",
+    weight: 1.3,
+    weightAddedAt: "19/09/2026",
+  }).success, false);
   assert.equal(trackingEventSchema.safeParse({
     orderId: "order-1",
     status: "PURCHASED",

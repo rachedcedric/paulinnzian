@@ -2,10 +2,11 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { invalidateSiteSettingsCache } from "@/lib/site-settings";
+import { getCachedSiteSettings, HERO_IMAGE_PATH, invalidateSiteSettingsCache } from "@/lib/site-settings";
 import {
   storeSchema,
   orderSchema,
+  orderWeightSchema,
   trackingEventSchema,
   testimonialSchema,
   faqSchema,
@@ -15,14 +16,17 @@ import {
 } from "@/lib/validations";
 import {
   ORDER_EXPORT_MAX_ROWS,
+  calculateWeightCharge,
   csvRow,
   formatOrderDateTime,
   nextDay,
   parseOrderListParams,
+  shiftDate,
   zonedDayStart,
   type OrderListParams,
 } from "@/lib/order-list";
 import { ORDER_STATUS_LABELS } from "@/types";
+import { buildDashboardPeriods, dashboardHistoryStart } from "@/lib/dashboard-stats";
 import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
@@ -195,7 +199,7 @@ export async function createOrder(data: unknown) {
   if (existing) return { success: false, error: "Ce numéro de suivi existe déjà" };
 
   try {
-    const { orderDate, ...rest } = parsed.data;
+    const { orderDate, weight, ...rest } = parsed.data;
     const order = await prisma.$transaction(async (transaction) => {
       await transaction.client.upsert({
         where: { phone: normalizePhone(rest.customerPhone) },
@@ -217,6 +221,8 @@ export async function createOrder(data: unknown) {
           storeName: rest.storeName || null,
           storeOrderNumber: rest.storeOrderNumber || null,
           internalNotes: rest.internalNotes || null,
+          weight: weight ?? null,
+          weightAddedAt: weight ? new Date() : null,
           orderDate: orderDate ? new Date(orderDate) : new Date(),
         },
       });
@@ -236,7 +242,7 @@ export async function updateOrder(id: string, data: unknown) {
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
   try {
-    const { orderDate, ...rest } = parsed.data;
+    const { orderDate, weight, ...rest } = parsed.data;
     const order = await prisma.$transaction(async (transaction) => {
       await transaction.client.upsert({
         where: { phone: normalizePhone(rest.customerPhone) },
@@ -259,6 +265,7 @@ export async function updateOrder(id: string, data: unknown) {
           storeName: rest.storeName || null,
           storeOrderNumber: rest.storeOrderNumber || null,
           internalNotes: rest.internalNotes || null,
+          ...(weight !== undefined ? { weight, weightAddedAt: new Date() } : {}),
           ...(orderDate ? { orderDate: new Date(orderDate) } : {}),
         },
       });
@@ -268,6 +275,27 @@ export async function updateOrder(id: string, data: unknown) {
     return { success: true, order };
   } catch {
     return { success: false, error: "Erreur lors de la mise à jour" };
+  }
+}
+
+export async function updateOrderWeight(data: unknown) {
+  await requireManager();
+  const parsed = orderWeightSchema.safeParse(data);
+  if (!parsed.success) return { success: false, error: "Poids ou date invalide" };
+
+  try {
+    const order = await prisma.order.update({
+      where: { id: parsed.data.orderId },
+      data: {
+        weight: parsed.data.weight,
+        weightAddedAt: new Date(parsed.data.weightAddedAt),
+      },
+    });
+    revalidatePath("/admin");
+    revalidatePath("/admin/commandes");
+    return { success: true, order };
+  } catch {
+    return { success: false, error: "Impossible d'enregistrer les frais de transport" };
   }
 }
 
@@ -417,6 +445,7 @@ export async function updateSiteSettings(data: Record<string, string>) {
   if (!settings) return { success: false, error: "Paramètres invalides" };
 
   for (const [key, value] of Object.entries(settings)) {
+    if (key === "hero_image" && value === HERO_IMAGE_PATH) continue;
     await prisma.siteSetting.upsert({
       where: { key },
       update: { value },
@@ -525,22 +554,8 @@ export async function getDashboardStats() {
   await requireViewer();
 
   const now = new Date();
-  const startOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfWeek  = new Date(now); startOfWeek.setDate(now.getDate() - 6);  startOfWeek.setHours(0,0,0,0);
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const startOfYear  = new Date(now.getFullYear(), 0, 1);
-
-  const revenueWhere = (from: Date) => ({
-    status: { notIn: ["CANCELLED" as const] },
-    orderDate: { gte: from },
-    amount: { not: null },
-  });
-
-  const weightWhere = (from?: Date) => ({
-    weight: { not: null },
-    status: { notIn: ["CANCELLED" as const] },
-    ...(from ? { orderDate: { gte: from } } : {}),
-  });
+  // One history window (start of the previous year) feeds every period and its comparison.
+  const historyStart = zonedDayStart(shiftDate(dashboardHistoryStart(now), -1));
 
   const standardShippingRate = await prisma.shippingRate.findFirst({
     where: { pricingType: "PER_KG", isActive: true, price: { not: null } },
@@ -549,16 +564,9 @@ export async function getDashboardStats() {
   });
   const weightRate = standardShippingRate?.price ?? 0;
 
-  const sumWeight = (rows: { weight: number | null }[]) =>
-    rows.reduce((sum, order) => sum + (order.weight ? Math.ceil(order.weight) * weightRate : 0), 0);
-
-  const sumAmount = (r: { _sum: { amount: number | null } }) => r._sum.amount ?? 0;
-
   const [
     totalOrders, activeOrders, deliveredOrders, activeStores, unreadMessages, publishedTestimonials,
-    totalRevenue,
-    revenueDay, revenueWeek, revenueMonth, revenueYear,
-    wAll, wDay, wWeek, wMonth, wYear,
+    totalRevenueAgg, allWeights, revenueRows, weightRows, recentOrders, recentMessages,
   ] = await Promise.all([
     prisma.order.count(),
     prisma.order.count({ where: { status: { notIn: ["DELIVERED", "CANCELLED"] } } }),
@@ -566,38 +574,35 @@ export async function getDashboardStats() {
     prisma.store.count({ where: { isActive: true } }),
     prisma.contactMessage.count({ where: { status: "UNREAD" } }),
     prisma.testimonial.count({ where: { isPublished: true } }),
-    prisma.order.aggregate({ _sum: { amount: true }, where: { status: { notIn: ["CANCELLED"] }, amount: { not: null } } }).then(sumAmount),
-    prisma.order.aggregate({ _sum: { amount: true }, where: revenueWhere(startOfDay) }).then(sumAmount),
-    prisma.order.aggregate({ _sum: { amount: true }, where: revenueWhere(startOfWeek) }).then(sumAmount),
-    prisma.order.aggregate({ _sum: { amount: true }, where: revenueWhere(startOfMonth) }).then(sumAmount),
-    prisma.order.aggregate({ _sum: { amount: true }, where: revenueWhere(startOfYear) }).then(sumAmount),
-    prisma.order.findMany({ where: weightWhere(),               select: { weight: true } }).then(sumWeight),
-    prisma.order.findMany({ where: weightWhere(startOfDay),     select: { weight: true } }).then(sumWeight),
-    prisma.order.findMany({ where: weightWhere(startOfWeek),    select: { weight: true } }).then(sumWeight),
-    prisma.order.findMany({ where: weightWhere(startOfMonth),   select: { weight: true } }).then(sumWeight),
-    prisma.order.findMany({ where: weightWhere(startOfYear),    select: { weight: true } }).then(sumWeight),
+    prisma.order.aggregate({ _sum: { amount: true }, where: { status: { notIn: ["CANCELLED"] }, amount: { not: null } } }),
+    prisma.order.findMany({
+      where: { weight: { not: null }, weightAddedAt: { not: null }, status: { notIn: ["CANCELLED"] } },
+      select: { weight: true },
+    }),
+    prisma.order.findMany({
+      where: { status: { notIn: ["CANCELLED"] }, orderDate: { gte: historyStart } },
+      select: { amount: true, orderDate: true, createdAt: true },
+    }),
+    prisma.order.findMany({
+      where: { weight: { not: null }, weightAddedAt: { gte: historyStart }, status: { notIn: ["CANCELLED"] } },
+      select: { weight: true, weightAddedAt: true },
+    }),
+    prisma.order.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, trackingNumber: true, customerName: true, destinationCity: true,
+        destinationCountry: true, status: true, createdAt: true,
+      },
+    }),
+    prisma.contactMessage.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, subject: true, status: true, createdAt: true },
+    }),
   ]);
 
-  const weightRevenue = { total: wAll, day: wDay, week: wWeek, month: wMonth, year: wYear, rate: weightRate };
-
-  const recentOrders = await prisma.order.findMany({
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      trackingNumber: true,
-      customerName: true,
-      destinationCity: true,
-      status: true,
-      createdAt: true,
-    },
-  });
-
-  const recentMessages = await prisma.contactMessage.findMany({
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    select: { id: true, name: true, subject: true, status: true, createdAt: true },
-  });
+  const totalTransport = allWeights.reduce((sum, o) => sum + calculateWeightCharge(o.weight, weightRate), 0);
 
   return {
     totalOrders,
@@ -606,15 +611,19 @@ export async function getDashboardStats() {
     activeStores,
     unreadMessages,
     publishedTestimonials,
-    totalRevenue,
-    revenueDay,
-    revenueWeek,
-    revenueMonth,
-    revenueYear,
-    weightRevenue,
+    totalRevenue: totalRevenueAgg._sum.amount ?? 0,
+    totalTransport,
+    weightRate,
+    periods: buildDashboardPeriods(revenueRows, weightRows, weightRate, now),
     recentOrders,
     recentMessages,
   };
+}
+
+/** Cheap count used by the admin shell (sidebar badge + notification bell). */
+export async function getUnreadMessageCount() {
+  await requireViewer();
+  return prisma.contactMessage.count({ where: { status: "UNREAD" } });
 }
 
 // ─── ADMIN GETTERS ────────────────────────────────────────────────────────────
@@ -657,7 +666,7 @@ export async function adminListOrders(rawParams: unknown) {
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
   const page = Math.min(params.page, totalPages);
 
-  const [orders, totalOrders, delivered, phones, destinations] = await Promise.all([
+  const [orders, totalOrders, delivered, phones, destinations, standardShippingRate] = await Promise.all([
     prisma.order.findMany({
       where,
       orderBy: buildOrderSort(params),
@@ -669,6 +678,11 @@ export async function adminListOrders(rawParams: unknown) {
     prisma.order.count({ where: { status: "DELIVERED" } }),
     prisma.order.groupBy({ by: ["customerPhone"] }),
     prisma.order.groupBy({ by: ["destinationCity"], orderBy: { destinationCity: "asc" } }),
+    prisma.shippingRate.findFirst({
+      where: { pricingType: "PER_KG", isActive: true, price: { not: null } },
+      orderBy: { displayOrder: "asc" },
+      select: { price: true },
+    }),
   ]);
 
   const uniqueClients = new Set(phones.map((p) => normalizePhone(p.customerPhone))).size;
@@ -685,6 +699,7 @@ export async function adminListOrders(rawParams: unknown) {
       uniqueClients,
     },
     destinations: destinations.map((d) => d.destinationCity).filter(Boolean),
+    weightRate: standardShippingRate?.price ?? 0,
   };
 }
 
@@ -708,6 +723,7 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
       amount: true,
       packageCount: true,
       weight: true,
+      weightAddedAt: true,
     },
   });
 
@@ -717,7 +733,7 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
   const lines = [
     csvRow([
       "N° Suivi", "Client", "Téléphone", "N° commande boutique", "Ville", "Pays",
-      "Statut", "Date", "Heure", "Montant (FCFA)", "Colis", "Poids (kg)",
+      "Statut", "Date", "Heure", "Montant (FCFA)", "Colis", "Poids (kg)", "Date ajout poids",
     ]),
     ...rows.map((o) => {
       const { date, time } = formatOrderDateTime(o.createdAt);
@@ -725,6 +741,7 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
         o.trackingNumber, o.customerName, o.customerPhone, o.storeOrderNumber,
         o.destinationCity, o.destinationCountry, ORDER_STATUS_LABELS[o.status] ?? o.status,
         date, time, o.amount, o.packageCount, o.weight,
+        o.weightAddedAt ? formatOrderDateTime(o.weightAddedAt).date : null,
       ]);
     }),
   ];
@@ -840,6 +857,5 @@ export async function adminGetMessages() {
 
 export async function adminGetSettings() {
   await requireSuperAdmin();
-  const settings = await prisma.siteSetting.findMany();
-  return Object.fromEntries(settings.map((s: { key: string; value: string }) => [s.key, s.value]));
+  return getCachedSiteSettings();
 }

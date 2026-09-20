@@ -116,7 +116,7 @@ export default async function RootLayout({
           }
           heroCtaPrimary={settings.hero_cta_primary || "Commander sur WhatsApp"}
           heroCtaSecondary={settings.hero_cta_secondary || "Faire un devis d'achat"}
-          heroImage={settings.hero_image || ""}
+          heroImage={settings.hero_image ? "/api/site-assets/hero" : ""}
           announcementEnabled={settings.announcement_enabled === "true"}
           announcementText={announcementText}
           announcementLink={settings.announcement_link || ""}

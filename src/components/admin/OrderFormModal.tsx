@@ -37,7 +37,6 @@ function defaultsFor(order: Order | null): Partial<OrderFormData> {
     destinationCountry: order.destinationCountry,
     amount: order.amount ?? undefined,
     packageCount: order.packageCount ?? undefined,
-    weight: order.weight ?? undefined,
     orderDate: new Date(order.orderDate).toISOString().split("T")[0],
   };
 }
@@ -109,13 +108,11 @@ export function OrderFormModal({ editing, onClose, onSaved }: Props) {
             <div><label className="block text-xs font-semibold mb-1">Date de commande</label>
               <input {...register("orderDate")} type="date" className={input} /></div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="block text-xs font-semibold mb-1">Montant (FCFA)</label>
               <input {...register("amount")} type="number" className={input} /></div>
             <div><label className="block text-xs font-semibold mb-1">Nb colis</label>
               <input {...register("packageCount")} type="number" className={input} /></div>
-            <div><label className="block text-xs font-semibold mb-1">Poids (kg) <span className="font-normal text-gray-400">(facultatif, renseigné à l&apos;arrivée)</span></label>
-              <input {...register("weight")} type="number" step="0.1" placeholder="ex: 1.3" className={input} /></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="block text-xs font-semibold mb-1">Ville destination *</label>

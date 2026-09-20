@@ -48,6 +48,17 @@ export const orderSchema = z.object({
   orderDate: z.iso.date().optional().or(z.literal("")),
 });
 
+export const orderWeightSchema = z.object({
+  orderId: entityIdSchema,
+  weight: z.coerce.number().finite().positive("Le poids doit être supérieur à 0").max(100_000),
+  weightAddedAt: z.preprocess(
+    (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+      ? `${value}T12:00:00`
+      : value,
+    z.iso.datetime({ local: true }),
+  ),
+});
+
 export const trackingEventSchema = z.object({
   orderId: entityIdSchema,
   status: z.enum(["PENDING", "PURCHASED", "RECEIVED_PARIS", "SHIPPED_DESTINATION", "ARRIVED_DESTINATION", "DELIVERED", "CANCELLED"]),
@@ -120,6 +131,7 @@ export const devisFormSchema = z.object({
 export type ContactFormData = z.infer<typeof contactSchema>;
 export type StoreFormData = z.infer<typeof storeSchema>;
 export type OrderFormData = z.infer<typeof orderSchema>;
+export type OrderWeightFormData = z.infer<typeof orderWeightSchema>;
 export type TrackingEventFormData = z.infer<typeof trackingEventSchema>;
 export type TestimonialFormData = z.infer<typeof testimonialSchema>;
 export type FAQFormData = z.infer<typeof faqSchema>;

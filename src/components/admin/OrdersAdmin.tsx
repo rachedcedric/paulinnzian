@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   ArrowDown, ArrowUp, ArrowUpDown, CheckCircle2, Download, Eye, Package, Pencil,
-  Plus, Search, Timer, Trash2, Users, X,
+  Plus, Scale, Search, Timer, Trash2, Users, X,
 } from "lucide-react";
 import { adminExportOrdersCsv, deleteOrder } from "@/actions/admin";
 import {
@@ -19,6 +19,7 @@ import { OrderStatusBadge } from "./OrderStatusBadge";
 import { OrdersPagination } from "./OrdersPagination";
 import { OrderFormModal } from "./OrderFormModal";
 import { OrderTrackingModal } from "./OrderTrackingModal";
+import { OrderWeightModal } from "./OrderWeightModal";
 
 export interface OrdersAdminProps {
   orders: Order[];
@@ -27,6 +28,7 @@ export interface OrdersAdminProps {
   totalPages: number;
   stats: { total: number; inProgress: number; delivered: number; uniqueClients: number };
   destinations: string[];
+  weightRate: number;
   canManage: boolean;
 }
 
@@ -43,7 +45,7 @@ const COLUMNS: { key: OrderSortKey; label: string; align?: "right" }[] = [
   { key: "amount", label: "Montant", align: "right" },
 ];
 
-export function OrdersAdmin({ orders, params, total, totalPages, stats, destinations, canManage }: OrdersAdminProps) {
+export function OrdersAdmin({ orders, params, total, totalPages, stats, destinations, weightRate, canManage }: OrdersAdminProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -51,6 +53,7 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Order | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
+  const [weightTarget, setWeightTarget] = useState<Order | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -182,6 +185,9 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
       </button>
       {canManage && (
         <>
+          <button onClick={() => setWeightTarget(order)} className="rounded-lg p-2 hover:bg-blue-50" title={order.weight ? "Modifier les frais au kg" : "Ajouter les frais au kg"} aria-label={`${order.weight ? "Modifier" : "Ajouter"} les frais au kg de la commande ${order.trackingNumber}`}>
+            <Scale className="h-4 w-4 text-blue-600" />
+          </button>
           <button onClick={() => openEdit(order)} className="rounded-lg p-2 hover:bg-gray-100" title="Modifier" aria-label="Modifier">
             <Pencil className="h-4 w-4 text-gray-500" />
           </button>
@@ -201,7 +207,7 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
   ];
 
   return (
-    <div className="min-h-full bg-[#F7F9FC] p-4 pt-16 sm:p-6 sm:pt-16 lg:p-8 lg:pt-8">
+    <div className="min-h-full bg-[#F7F9FC] p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -410,7 +416,23 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
       )}
 
       {viewOrder && (
-        <OrderTrackingModal order={viewOrder} canManage={canManage} onClose={() => setViewId(null)} onChanged={refresh} />
+        <OrderTrackingModal
+          order={viewOrder}
+          weightRate={weightRate}
+          canManage={canManage}
+          onClose={() => setViewId(null)}
+          onChanged={refresh}
+          onEditWeight={() => { setViewId(null); setWeightTarget(viewOrder); }}
+        />
+      )}
+
+      {weightTarget && (
+        <OrderWeightModal
+          order={weightTarget}
+          weightRate={weightRate}
+          onClose={() => setWeightTarget(null)}
+          onSaved={() => { setWeightTarget(null); refresh(); }}
+        />
       )}
 
       {deleteTarget && (

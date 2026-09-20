@@ -39,8 +39,15 @@ export function HeroVisual({ stores, image }: { stores: Store[]; image?: string 
   return (
     <div className="relative rounded-3xl overflow-hidden aspect-[4/5] sm:aspect-[16/11] lg:aspect-[4/5] xl:aspect-[16/12]">
       {image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <Image
+          src={image}
+          alt=""
+          fill
+          priority
+          quality={80}
+          sizes="(min-width: 1280px) 584px, (min-width: 1024px) 42vw, (min-width: 640px) 90vw, 100vw"
+          className="object-cover"
+        />
       ) : (
         <>
           {/* Sky */}

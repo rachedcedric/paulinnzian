@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { X, Trash2, PlusCircle } from "lucide-react";
+import { X, Trash2, PlusCircle, Scale } from "lucide-react";
 import { addTrackingEvent, deleteTrackingEvent } from "@/actions/admin";
 import { trackingEventSchema, type TrackingEventFormData } from "@/lib/validations";
 import { ORDER_STATUS_LABELS } from "@/types";
 import type { Order } from "@/types";
 import { formatDate, formatDateInput } from "@/lib/utils";
+import { calculateWeightCharge } from "@/lib/order-list";
 import { countryFlag } from "@/lib/country-flag";
 import { OrderStatusBadge } from "./OrderStatusBadge";
 
@@ -29,12 +30,14 @@ function Detail({ label, value }: { label: string; value: React.ReactNode }) {
 
 interface Props {
   order: Order;
+  weightRate: number;
   canManage: boolean;
   onClose: () => void;
   onChanged: () => void;
+  onEditWeight: () => void;
 }
 
-export function OrderTrackingModal({ order, canManage, onClose, onChanged }: Props) {
+export function OrderTrackingModal({ order, weightRate, canManage, onClose, onChanged, onEditWeight }: Props) {
   const [showEventForm, setShowEventForm] = useState(false);
   const {
     register,
@@ -97,7 +100,16 @@ export function OrderTrackingModal({ order, canManage, onClose, onChanged }: Pro
             <Detail label="Montant" value={order.amount != null ? `${numberFormat.format(order.amount)} FCFA` : null} />
             <Detail label="Nombre de colis" value={order.packageCount} />
             <Detail label="Poids" value={order.weight != null ? `${numberFormat.format(order.weight)} kg` : null} />
+            <Detail label="Date d'ajout du poids" value={order.weightAddedAt ? formatDate(order.weightAddedAt) : null} />
+            <Detail label="Frais de transport" value={order.weight != null ? `${numberFormat.format(calculateWeightCharge(order.weight, weightRate))} FCFA` : null} />
           </dl>
+
+          {canManage && (
+            <button type="button" onClick={onEditWeight} className="inline-flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">
+              <Scale className="h-4 w-4" />
+              {order.weight ? "Modifier le poids et sa date" : "Ajouter le poids et sa date"}
+            </button>
+          )}
 
           {order.internalNotes && (
             <div>

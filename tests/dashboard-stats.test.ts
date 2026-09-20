@@ -1,0 +1,69 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { buildDashboardPeriods, formatFcfa, niceAxisMax, percentChange } from "../src/lib/dashboard-stats";
+
+// 2026-09-18 15:30 Paris (CEST = UTC+2)
+const NOW = new Date("2026-09-18T13:30:00Z");
+const at = (iso: string) => new Date(iso);
+
+test("day / week / month / year totals, counts and average", () => {
+  const rows = [
+    { amount: 10000, orderDate: at("2026-09-18T00:00:00Z"), createdAt: at("2026-09-18T08:15:00Z") }, // today, 10h Paris
+    { amount: 20000, orderDate: at("2026-09-18T00:00:00Z"), createdAt: at("2026-09-18T11:00:00Z") }, // today, 13h
+    { amount: 5000, orderDate: at("2026-09-17T00:00:00Z"), createdAt: at("2026-09-17T09:00:00Z") }, // yesterday
+    { amount: 7000, orderDate: at("2026-09-02T00:00:00Z"), createdAt: at("2026-09-02T09:00:00Z") }, // this month
+    { amount: 9000, orderDate: at("2026-03-02T00:00:00Z"), createdAt: at("2026-03-02T09:00:00Z") }, // this year
+    { amount: null, orderDate: at("2026-09-18T00:00:00Z"), createdAt: at("2026-09-18T09:00:00Z") }, // today, no amount
+  ];
+  const { revenue } = buildDashboardPeriods(rows, [], 0, NOW);
+  assert.equal(revenue.day.total, 30000);
+  assert.equal(revenue.day.orders, 3);
+  assert.equal(revenue.day.average, 10000);
+  assert.equal(revenue.day.series.length, 24);
+  assert.equal(revenue.day.series[10].value, 10000);
+  assert.equal(revenue.day.series[13].value, 20000);
+  assert.equal(revenue.week.total, 35000);
+  assert.equal(revenue.month.total, 42000);
+  assert.equal(revenue.month.series.length, 18);
+  assert.equal(revenue.year.total, 51000);
+  assert.equal(revenue.year.series[2].value, 9000);
+  assert.equal(revenue.day.change, 500); // 30000 vs 5000 yesterday
+});
+
+test("no data → zeros, no NaN, no fake change", () => {
+  const { revenue, transport } = buildDashboardPeriods([], [], 9800, NOW);
+  assert.equal(revenue.day.total, 0);
+  assert.equal(revenue.day.average, 0);
+  assert.equal(revenue.day.change, null);
+  assert.equal(transport.year.weightKg, 0);
+  assert.ok(revenue.week.series.every((p) => p.value === 0));
+});
+
+test("transport uses ceil(weight) × rate and keeps real weight", () => {
+  const rows = [
+    { weight: 1.2, weightAddedAt: at("2026-09-18T07:00:00Z") }, // 9h Paris → 2 kg billed
+    { weight: 3, weightAddedAt: at("2026-09-18T07:30:00Z") },
+    { weight: 2, weightAddedAt: at("2026-09-17T07:30:00Z") },
+    { weight: null, weightAddedAt: at("2026-09-18T07:30:00Z") },
+  ];
+  const { transport } = buildDashboardPeriods([], rows, 9800, NOW);
+  assert.equal(transport.day.total, (2 + 3) * 9800);
+  assert.equal(transport.day.packages, 2);
+  assert.equal(transport.day.weightKg, 4.2);
+  assert.equal(transport.day.series[9].value, 5 * 9800);
+  assert.equal(transport.week.total, (2 + 3 + 2) * 9800);
+  assert.equal(transport.day.change, 150); // 49000 vs 19600
+});
+
+test("Paris midnight boundary: 23:30 UTC belongs to the next Paris day", () => {
+  const rows = [{ weight: 1, weightAddedAt: at("2026-09-17T22:30:00Z") }]; // 00:30 on the 18th, Paris
+  assert.equal(buildDashboardPeriods([], rows, 100, NOW).transport.day.total, 100);
+});
+
+test("helpers", () => {
+  assert.equal(percentChange(10, 0), null);
+  assert.equal(percentChange(90, 100), -10);
+  assert.equal(niceAxisMax(161837), 200000);
+  assert.equal(niceAxisMax(0), 4);
+  assert.equal(formatFcfa(2311125).replace(/\s/g, " "), "2 311 125 F CFA");
+});

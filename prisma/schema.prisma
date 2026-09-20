@@ -104,6 +104,7 @@ model Order {
   amount             Float?
   packageCount       Int?
   weight             Float?
+  weightAddedAt      DateTime?
   destinationCity    String          @db.VarChar(100)
   destinationCountry String          @db.VarChar(100)
   internalNotes      String?         @db.Text
@@ -113,6 +114,7 @@ model Order {
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 
+  @@index([weightAddedAt])
   @@map("orders")
 }
 

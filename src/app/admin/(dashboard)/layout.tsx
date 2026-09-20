@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminShell } from "@/components/admin/AdminShell";
+import { getUnreadMessageCount } from "@/actions/admin";
 import { Toaster } from "sonner";
 
 export default async function AdminDashboardLayout({
@@ -11,13 +12,21 @@ export default async function AdminDashboardLayout({
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
 
+  const unreadMessages = await getUnreadMessageCount().catch((error) => {
+    console.error("[admin] unread message count failed", error);
+    return 0;
+  });
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <AdminSidebar role={(session.user as { role?: string }).role} />
-      <div className="flex-1 min-w-0 lg:ml-64 min-h-screen">
+    <>
+      <AdminShell
+        role={(session.user as { role?: string }).role}
+        name={session.user.name || "Administrateur"}
+        unreadMessages={unreadMessages}
+      >
         {children}
-      </div>
+      </AdminShell>
       <Toaster richColors position="top-right" />
-    </div>
+    </>
   );
 }
