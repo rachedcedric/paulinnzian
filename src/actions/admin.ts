@@ -120,6 +120,7 @@ export async function createStore(data: unknown) {
 
   try {
     const store = await prisma.store.create({ data: parsed.data });
+    revalidatePath("/");
     revalidatePath("/boutiques");
     revalidatePath("/admin/boutiques");
     return { success: true, store };
@@ -136,6 +137,7 @@ export async function updateStore(id: string, data: unknown) {
 
   try {
     const store = await prisma.store.update({ where: { id }, data: parsed.data });
+    revalidatePath("/");
     revalidatePath("/boutiques");
     revalidatePath("/admin/boutiques");
     return { success: true, store };
@@ -148,6 +150,7 @@ export async function deleteStore(id: string) {
   await requireManager();
   if (!isValidEntityId(id)) return invalidIdResult;
   await prisma.store.delete({ where: { id } });
+  revalidatePath("/");
   revalidatePath("/boutiques");
   revalidatePath("/admin/boutiques");
   return { success: true };
@@ -157,6 +160,7 @@ export async function toggleStoreActive(id: string, isActive: boolean) {
   await requireManager();
   if (!isValidEntityId(id) || typeof isActive !== "boolean") return { success: false, error: "Données invalides" };
   await prisma.store.update({ where: { id }, data: { isActive } });
+  revalidatePath("/");
   revalidatePath("/boutiques");
   revalidatePath("/admin/boutiques");
   return { success: true };
