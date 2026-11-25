@@ -1,17 +1,40 @@
 import { z } from "zod";
-import type { OrderStatus } from "@prisma/client";
+import type { ArticleType, OrderStatus } from "@prisma/client";
+import { DEVIS_FCFA_PER_EUR } from "@/lib/devis";
 
 /** Pure helpers shared by the server (queries/export) and the client (URL building). */
 
 export const ORDER_STATUSES = [
   "PENDING",
   "PURCHASED",
+  "SHIPPED_PARIS",
   "RECEIVED_PARIS",
   "SHIPPED_DESTINATION",
   "ARRIVED_DESTINATION",
   "DELIVERED",
   "CANCELLED",
 ] as const satisfies readonly OrderStatus[];
+
+/** Statuses offered in the order form. PENDING and CANCELLED stay readable on old orders. */
+export const ORDER_FORM_STATUSES = [
+  "PURCHASED",
+  "SHIPPED_PARIS",
+  "RECEIVED_PARIS",
+  "SHIPPED_DESTINATION",
+  "ARRIVED_DESTINATION",
+  "DELIVERED",
+] as const satisfies readonly OrderStatus[];
+
+/** Statuses offered everywhere else (list filter, tracking events): the same steps plus "Annulé". */
+export const ORDER_SELECTABLE_STATUSES = [...ORDER_FORM_STATUSES, "CANCELLED"] as const satisfies readonly OrderStatus[];
+
+/** ABJ-2026-252 → ABJ-2026-253: same prefix and zero padding as the previous order. */
+export function nextTrackingNumber(last: string | null | undefined, year = new Date().getFullYear()): string {
+  const match = last?.trim().match(/^(.*?)(\d{1,15})$/);
+  if (!match) return `ABJ-${year}-001`;
+  const [, prefix, digits] = match;
+  return `${prefix}${String(Number(digits) + 1).padStart(digits.length, "0")}`;
+}
 
 export const PAGE_SIZES = [10, 20, 50, 100] as const;
 export type PageSize = (typeof PAGE_SIZES)[number];
@@ -200,6 +223,33 @@ export function formatOrderDateTime(value: Date | string) {
 export function calculateWeightCharge(weight: number | null | undefined, rate: number) {
   if (!weight || !Number.isFinite(weight) || weight <= 0 || !Number.isFinite(rate) || rate < 0) return 0;
   return Math.ceil(weight) * rate;
+}
+
+export interface OrderPricing {
+  articleType: ArticleType;
+  amount: number | null;
+  weight: number | null;
+  kgRate: number | null;
+  luxePercent: number | null;
+}
+
+/** Luxury items pay a percentage of the order amount, everything else pays per kilogram. */
+export function orderShippingFee(order: OrderPricing, defaultKgRate = 0) {
+  if (order.articleType === "LUXE") {
+    const amount = order.amount ?? 0;
+    const percent = order.luxePercent ?? 0;
+    return amount > 0 && percent > 0 ? Math.round((amount * percent) / 100) : 0;
+  }
+  return calculateWeightCharge(order.weight, order.kgRate ?? defaultKgRate);
+}
+
+/** Official EUR → FCFA parity; clients pay DEVIS_FCFA_PER_EUR, the difference is the margin. */
+export const OFFICIAL_FCFA_PER_EUR = 655.96;
+
+/** Exchange margin earned on an amount paid in FCFA at the client rate (14.04 FCFA per euro). */
+export function exchangeMargin(amountFcfa: number | null | undefined) {
+  if (!amountFcfa || !Number.isFinite(amountFcfa) || amountFcfa <= 0) return 0;
+  return Math.round((amountFcfa / DEVIS_FCFA_PER_EUR) * (DEVIS_FCFA_PER_EUR - OFFICIAL_FCFA_PER_EUR));
 }
 
 // ─── CSV ────────────────────────────────────────────────────────────────────

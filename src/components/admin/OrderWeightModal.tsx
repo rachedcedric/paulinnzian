@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Scale, X } from "lucide-react";
 import { toast } from "sonner";
 import { updateOrderWeight } from "@/actions/admin";
-import { calculateWeightCharge } from "@/lib/order-list";
+import { orderShippingFee } from "@/lib/order-list";
 import { formatDateInput } from "@/lib/utils";
 import type { Order } from "@/types";
 
@@ -18,12 +18,15 @@ interface Props {
 const numberFormat = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 const input = "mt-1 h-11 w-full rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#D99A12]";
 
-export function OrderWeightModal({ order, weightRate, onClose, onSaved }: Props) {
+export function OrderWeightModal({ order, weightRate: defaultRate, onClose, onSaved }: Props) {
+  const isLuxe = order.articleType === "LUXE";
+  // The price frozen on the order wins; old orders without one use the default tariff.
+  const weightRate = order.kgRate ?? defaultRate;
   const [weight, setWeight] = useState(order.weight?.toString() ?? "");
   const [weightAddedAt, setWeightAddedAt] = useState(formatDateInput(order.weightAddedAt ?? new Date()));
   const [saving, setSaving] = useState(false);
   const numericWeight = Number(weight);
-  const charge = calculateWeightCharge(numericWeight, weightRate);
+  const charge = orderShippingFee({ ...order, weight: numericWeight }, defaultRate);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -85,18 +88,24 @@ export function OrderWeightModal({ order, weightRate, onClose, onSaved }: Props)
             </div>
             <div>
               <p className="text-xs text-gray-500">
-                {Number.isFinite(numericWeight) && numericWeight > 0 ? `${Math.ceil(numericWeight)} kg facturé(s)` : "Poids à renseigner"}
-                {weightRate > 0 && ` × ${numberFormat.format(weightRate)} FCFA`}
+                {isLuxe ? (
+                  `Article de luxe : ${numberFormat.format(order.luxePercent ?? 0)} % du montant (le poids n'est pas facturé)`
+                ) : (
+                  <>
+                    {Number.isFinite(numericWeight) && numericWeight > 0 ? `${Math.ceil(numericWeight)} kg facturé(s)` : "Poids à renseigner"}
+                    {weightRate > 0 && ` × ${numberFormat.format(weightRate)} FCFA`}
+                  </>
+                )}
               </p>
               <p className="text-xl font-black text-gray-900">{numberFormat.format(charge)} FCFA</p>
             </div>
           </div>
 
-          {weightRate <= 0 && <p className="text-xs font-medium text-red-600">Aucun tarif actif par kilogramme n&apos;est configuré.</p>}
+          {!isLuxe && weightRate <= 0 && <p className="text-xs font-medium text-red-600">Aucun tarif actif par kilogramme n&apos;est configuré.</p>}
 
           <div className="flex gap-3">
             <button type="button" onClick={onClose} disabled={saving} className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700">Annuler</button>
-            <button type="submit" disabled={saving || weightRate <= 0} className="flex-1 rounded-xl bg-[#D99A12] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#C8912D] disabled:opacity-50">
+            <button type="submit" disabled={saving || (!isLuxe && weightRate <= 0)} className="flex-1 rounded-xl bg-[#D99A12] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#C8912D] disabled:opacity-50">
               {saving ? "Enregistrement..." : "Enregistrer"}
             </button>
           </div>

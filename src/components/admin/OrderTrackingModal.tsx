@@ -7,14 +7,15 @@ import { toast } from "sonner";
 import { X, Trash2, PlusCircle, Scale } from "lucide-react";
 import { addTrackingEvent, deleteTrackingEvent } from "@/actions/admin";
 import { trackingEventSchema, type TrackingEventFormData } from "@/lib/validations";
-import { ORDER_STATUS_LABELS } from "@/types";
+import { ARTICLE_TYPE_LABELS, ORDER_STATUS_LABELS } from "@/types";
 import type { Order } from "@/types";
 import { formatDate, formatDateInput } from "@/lib/utils";
-import { calculateWeightCharge } from "@/lib/order-list";
+import { ORDER_FORM_STATUSES, ORDER_SELECTABLE_STATUSES, orderShippingFee } from "@/lib/order-list";
 import { countryFlag } from "@/lib/country-flag";
 import { OrderStatusBadge } from "./OrderStatusBadge";
 
-const STATUS_OPTIONS = Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({ value, label }));
+// Same steps as the order form, plus "Annulé" (an event is the only way to cancel an order).
+const STATUS_OPTIONS = ORDER_SELECTABLE_STATUSES.map((value) => ({ value, label: ORDER_STATUS_LABELS[value] }));
 const input =
   "w-full px-3 py-2 border rounded-lg text-xs focus:ring-2 focus:ring-[#D99A12] focus:outline-none";
 const numberFormat = new Intl.NumberFormat("fr-FR");
@@ -39,6 +40,11 @@ interface Props {
 
 export function OrderTrackingModal({ order, weightRate, canManage, onClose, onChanged, onEditWeight }: Props) {
   const [showEventForm, setShowEventForm] = useState(false);
+  const isLuxe = order.articleType === "LUXE";
+  const fee = orderShippingFee(order, weightRate);
+  // A new event defaults to the step after the current one.
+  const currentStep = (ORDER_FORM_STATUSES as readonly string[]).indexOf(order.status);
+  const nextStatus = ORDER_FORM_STATUSES[Math.min(currentStep + 1, ORDER_FORM_STATUSES.length - 1)];
   const {
     register,
     handleSubmit,
@@ -101,7 +107,14 @@ export function OrderTrackingModal({ order, weightRate, canManage, onClose, onCh
             <Detail label="Nombre de colis" value={order.packageCount} />
             <Detail label="Poids" value={order.weight != null ? `${numberFormat.format(order.weight)} kg` : null} />
             <Detail label="Date d'ajout du poids" value={order.weightAddedAt ? formatDate(order.weightAddedAt) : null} />
-            <Detail label="Frais de transport" value={order.weight != null ? `${numberFormat.format(calculateWeightCharge(order.weight, weightRate))} FCFA` : null} />
+            <Detail label="Type d'articles" value={ARTICLE_TYPE_LABELS[order.articleType]} />
+            <Detail
+              label="Tarif"
+              value={isLuxe
+                ? `${numberFormat.format(order.luxePercent ?? 0)} % du montant`
+                : `${numberFormat.format(order.kgRate ?? weightRate)} FCFA/kg`}
+            />
+            <Detail label="Frais de transport" value={isLuxe || order.weight != null ? `${numberFormat.format(fee)} FCFA` : null} />
           </dl>
 
           {canManage && (
@@ -125,7 +138,7 @@ export function OrderTrackingModal({ order, weightRate, canManage, onClose, onCh
             {canManage && (
               <button
                 onClick={() => {
-                  reset({ orderId: order.id, status: "PENDING", title: "", eventDate: formatDateInput(), displayOrder: 0 });
+                  reset({ orderId: order.id, status: nextStatus, title: "", eventDate: formatDateInput(), displayOrder: 0 });
                   setShowEventForm(true);
                 }}
                 className="flex items-center gap-1 text-sm text-[#D99A12] font-semibold"

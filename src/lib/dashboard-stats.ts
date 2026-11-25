@@ -1,4 +1,4 @@
-import { ORDERS_TIMEZONE, calculateWeightCharge, shiftDate } from "@/lib/order-list";
+import { ORDERS_TIMEZONE, shiftDate } from "@/lib/order-list";
 
 /**
  * Pure dashboard aggregation (no DB access) so it can be unit-tested.
@@ -27,6 +27,8 @@ export interface SeriesPoint {
 
 export interface PeriodRevenue {
   total: number;
+  /** Same figure over the previous equivalent period (feeds the profit comparison). */
+  previousTotal: number;
   orders: number;
   average: number;
   series: SeriesPoint[];
@@ -36,6 +38,7 @@ export interface PeriodRevenue {
 
 export interface PeriodTransport {
   total: number;
+  previousTotal: number;
   packages: number;
   weightKg: number;
   series: SeriesPoint[];
@@ -52,9 +55,11 @@ export interface RevenueRow {
   orderDate: Date;
   createdAt: Date;
 }
-export interface WeightRow {
+/** One billed shipment. The caller computes the fee (per kg, or a % of the amount for luxury items). */
+export interface FeeRow {
+  fee: number;
   weight: number | null;
-  weightAddedAt: Date | null;
+  date: Date | null;
 }
 
 const partsFormatter = new Intl.DateTimeFormat("en-US", {
@@ -165,8 +170,7 @@ export function percentChange(current: number, previous: number): number | null 
 
 export function buildDashboardPeriods(
   revenueRows: RevenueRow[],
-  weightRows: WeightRow[],
-  weightRate: number,
+  feeRows: FeeRow[],
   now = new Date(),
 ): DashboardPeriods {
   const today = parisDateHour(now).date;
@@ -182,10 +186,10 @@ export function buildDashboardPeriods(
   });
 
   const weightPoints: Point[] = [];
-  for (const row of weightRows) {
-    if (!row.weight || !row.weightAddedAt) continue;
-    const { date, hour } = parisDateHour(row.weightAddedAt);
-    weightPoints.push({ date, hour, value: calculateWeightCharge(row.weight, weightRate), count: 1, extra: row.weight });
+  for (const row of feeRows) {
+    if (!row.date || (!row.weight && !(row.fee > 0))) continue;
+    const { date, hour } = parisDateHour(row.date);
+    weightPoints.push({ date, hour, value: row.fee, count: 1, extra: row.weight ?? 0 });
   }
 
   const sum = (points: Point[], r: Range, key: "value" | "count" | "extra") =>
@@ -198,21 +202,25 @@ export function buildDashboardPeriods(
     const { current, previous } = ranges[key];
     const total = sum(revenuePoints, current, "value");
     const orders = sum(revenuePoints, current, "count");
+    const previousTotal = sum(revenuePoints, previous, "value");
     revenue[key] = {
       total,
+      previousTotal,
       orders,
       average: orders > 0 ? Math.round(total / orders) : 0,
       series: buildSeries(key, today, revenuePoints.filter((p) => inRange(p.date, current))),
-      change: percentChange(total, sum(revenuePoints, previous, "value")),
+      change: percentChange(total, previousTotal),
     };
 
     const fees = sum(weightPoints, current, "value");
+    const previousFees = sum(weightPoints, previous, "value");
     transport[key] = {
       total: fees,
+      previousTotal: previousFees,
       packages: sum(weightPoints, current, "count"),
       weightKg: Math.round(sum(weightPoints, current, "extra") * 10) / 10,
       series: buildSeries(key, today, weightPoints.filter((p) => inRange(p.date, current))),
-      change: percentChange(fees, sum(weightPoints, previous, "value")),
+      change: percentChange(fees, previousFees),
     };
   }
 

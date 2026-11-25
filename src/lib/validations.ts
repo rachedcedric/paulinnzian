@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ORDER_STATUSES } from "@/lib/order-list";
 
 export const entityIdSchema = z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9_-]+$/);
 export const trackingLookupSchema = z.string().trim().min(3).max(100).regex(/^[\p{L}\p{N}._-]+$/u).transform((value) => value.toUpperCase());
@@ -15,7 +16,8 @@ export const storeSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(100),
   slug: z.string().trim().min(1).max(100).regex(/^[a-z0-9-]+$/, "Slug invalide"),
   logo: z.string().max(7_000_000).optional(),
-  websiteUrl: z.string().trim().url("URL invalide").max(2_048),
+  // http(s) only: this value becomes a clickable href on the public site.
+  websiteUrl: z.string().trim().url("URL invalide").regex(/^https?:\/\//i, "URL invalide").max(2_048),
   category: z.string().trim().min(1, "La catégorie est requise").max(80),
   description: z.string().trim().max(1_000).optional(),
   displayOrder: z.coerce.number().int().min(0).max(10_000).default(0),
@@ -44,7 +46,10 @@ export const orderSchema = z.object({
   destinationCity: z.string().trim().min(1, "La ville est requise").max(100),
   destinationCountry: z.string().trim().min(1, "Le pays est requis").max(100),
   internalNotes: z.string().trim().max(5_000).optional(),
-  status: z.enum(["PENDING", "PURCHASED", "RECEIVED_PARIS", "SHIPPED_DESTINATION", "ARRIVED_DESTINATION", "DELIVERED", "CANCELLED"]),
+  status: z.enum(ORDER_STATUSES),
+  articleType: z.enum(["STANDARD", "LUXE"]).default("STANDARD"),
+  // Per-kg tariff picked in the form; the server reads its price, the client never sends one.
+  shippingRateId: entityIdSchema.optional().or(z.literal("")),
   orderDate: z.iso.date().optional().or(z.literal("")),
 });
 
@@ -61,7 +66,7 @@ export const orderWeightSchema = z.object({
 
 export const trackingEventSchema = z.object({
   orderId: entityIdSchema,
-  status: z.enum(["PENDING", "PURCHASED", "RECEIVED_PARIS", "SHIPPED_DESTINATION", "ARRIVED_DESTINATION", "DELIVERED", "CANCELLED"]),
+  status: z.enum(ORDER_STATUSES),
   title: z.string().trim().min(1, "Le titre est requis").max(150),
   description: z.string().trim().max(1_000).optional(),
   location: z.string().trim().max(150).optional(),

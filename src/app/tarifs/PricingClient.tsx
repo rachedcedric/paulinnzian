@@ -43,7 +43,7 @@ export function PricingClient({
             <p className="text-gray-500 mb-8">De Paris vers votre destination.</p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className={`grid sm:grid-cols-2 gap-6 ${shippingRates.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"}`}>
             {shippingRates.map((rate, i) => {
               const Icon = shippingIcons[i % shippingIcons.length];
               return (

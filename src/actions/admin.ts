@@ -16,16 +16,17 @@ import {
 } from "@/lib/validations";
 import {
   ORDER_EXPORT_MAX_ROWS,
-  calculateWeightCharge,
   csvRow,
   formatOrderDateTime,
   nextDay,
+  nextTrackingNumber,
+  orderShippingFee,
   parseOrderListParams,
   shiftDate,
   zonedDayStart,
   type OrderListParams,
 } from "@/lib/order-list";
-import { ORDER_STATUS_LABELS } from "@/types";
+import { ARTICLE_TYPE_LABELS, ORDER_STATUS_LABELS } from "@/types";
 import { buildDashboardPeriods, dashboardHistoryStart } from "@/lib/dashboard-stats";
 import type { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -57,6 +58,7 @@ const requireSuperAdmin = () => requireRole(SUPER_ADMIN_ROLES);
 
 const SITE_SETTING_KEYS = new Set([
   "site_name", "site_slogan", "whatsapp_number", "whatsapp_link", "phone_ci",
+  "whatsapp_channel_url", "whatsapp_group_url",
   "address_paris", "address_abidjan", "facebook_url", "instagram_url", "tiktok_url", "hero_title",
   "hero_subtitle", "meta_description", "facebook_pixel_id", "google_ads_id",
   "google_analytics_id", "tiktok_pixel_id",
@@ -66,6 +68,8 @@ const SITE_SETTING_KEYS = new Set([
 ]);
 const SETTING_URL_HOSTS: Record<string, readonly string[]> = {
   whatsapp_link: ["wa.me", "api.whatsapp.com"],
+  whatsapp_channel_url: ["whatsapp.com", "www.whatsapp.com"],
+  whatsapp_group_url: ["chat.whatsapp.com"],
   facebook_url: ["facebook.com", "www.facebook.com"],
   instagram_url: ["instagram.com", "www.instagram.com"],
   tiktok_url: ["tiktok.com", "www.tiktok.com"],
@@ -188,6 +192,26 @@ export async function updateShippingRate(
 }
 
 // ─── ORDERS ───────────────────────────────────────────────────────────────────
+/** Prices come from the database: the form only sends the article type and a tariff id. */
+async function resolveOrderPricing(articleType: "STANDARD" | "LUXE", shippingRateId?: string) {
+  if (articleType === "LUXE") {
+    const rate = await prisma.shippingRate.findFirst({
+      where: { pricingType: "PERCENTAGE", isActive: true, percentage: { not: null } },
+      orderBy: { displayOrder: "asc" },
+      select: { percentage: true },
+    });
+    return rate ? { kgRate: null, luxePercent: rate.percentage } : null;
+  }
+  if (!shippingRateId) return null;
+  const rate = await prisma.shippingRate.findFirst({
+    where: { id: shippingRateId, pricingType: "PER_KG", isActive: true, price: { not: null } },
+    select: { price: true },
+  });
+  return rate ? { kgRate: rate.price, luxePercent: null } : null;
+}
+
+const invalidPricingResult = { success: false as const, error: "Tarif d'expédition invalide ou inactif" };
+
 export async function createOrder(data: unknown) {
   await requireManager();
   const parsed = orderSchema.safeParse(data);
@@ -199,7 +223,10 @@ export async function createOrder(data: unknown) {
   if (existing) return { success: false, error: "Ce numéro de suivi existe déjà" };
 
   try {
-    const { orderDate, weight, ...rest } = parsed.data;
+    const { orderDate, weight, shippingRateId, ...rest } = parsed.data;
+    const pricing = await resolveOrderPricing(rest.articleType, shippingRateId);
+    if (!pricing) return invalidPricingResult;
+
     const order = await prisma.$transaction(async (transaction) => {
       await transaction.client.upsert({
         where: { phone: normalizePhone(rest.customerPhone) },
@@ -217,6 +244,7 @@ export async function createOrder(data: unknown) {
       return transaction.order.create({
         data: {
           ...rest,
+          ...pricing,
           customerEmail: rest.customerEmail || null,
           storeName: rest.storeName || null,
           storeOrderNumber: rest.storeOrderNumber || null,
@@ -242,7 +270,14 @@ export async function updateOrder(id: string, data: unknown) {
   if (!parsed.success) return { success: false, error: "Données invalides" };
 
   try {
-    const { orderDate, weight, ...rest } = parsed.data;
+    const { orderDate, weight, shippingRateId, ...rest } = parsed.data;
+    const existing = await prisma.order.findUnique({ where: { id }, select: { articleType: true } });
+    if (!existing) return { success: false, error: "Commande introuvable" };
+    // Same article type and no tariff picked again → the price frozen on the order is kept.
+    const keepPricing = rest.articleType === existing.articleType && (rest.articleType === "LUXE" || !shippingRateId);
+    const pricing = keepPricing ? {} : await resolveOrderPricing(rest.articleType, shippingRateId);
+    if (!pricing) return invalidPricingResult;
+
     const order = await prisma.$transaction(async (transaction) => {
       await transaction.client.upsert({
         where: { phone: normalizePhone(rest.customerPhone) },
@@ -261,6 +296,7 @@ export async function updateOrder(id: string, data: unknown) {
         where: { id },
         data: {
           ...rest,
+          ...pricing,
           customerEmail: rest.customerEmail || null,
           storeName: rest.storeName || null,
           storeOrderNumber: rest.storeOrderNumber || null,
@@ -347,7 +383,7 @@ export async function deleteTrackingEvent(id: string) {
     });
     await transaction.order.update({
       where: { id: event.orderId },
-      data: { status: latestEvent?.status ?? "PENDING" },
+      data: { status: latestEvent?.status ?? "PURCHASED" },
     });
   });
   revalidatePath("/suivi");
@@ -566,7 +602,7 @@ export async function getDashboardStats() {
 
   const [
     totalOrders, activeOrders, deliveredOrders, activeStores, unreadMessages, publishedTestimonials,
-    totalRevenueAgg, allWeights, revenueRows, weightRows, recentOrders, recentMessages,
+    totalRevenueAgg, feeOrders, revenueRows, recentOrders, recentMessages,
   ] = await Promise.all([
     prisma.order.count(),
     prisma.order.count({ where: { status: { notIn: ["DELIVERED", "CANCELLED"] } } }),
@@ -576,16 +612,21 @@ export async function getDashboardStats() {
     prisma.testimonial.count({ where: { isPublished: true } }),
     prisma.order.aggregate({ _sum: { amount: true }, where: { status: { notIn: ["CANCELLED"] }, amount: { not: null } } }),
     prisma.order.findMany({
-      where: { weight: { not: null }, weightAddedAt: { not: null }, status: { notIn: ["CANCELLED"] } },
-      select: { weight: true },
+      where: {
+        status: { notIn: ["CANCELLED"] },
+        OR: [
+          { weight: { not: null }, weightAddedAt: { not: null } },
+          { articleType: "LUXE", amount: { not: null } },
+        ],
+      },
+      select: {
+        articleType: true, amount: true, weight: true, kgRate: true, luxePercent: true,
+        weightAddedAt: true, orderDate: true,
+      },
     }),
     prisma.order.findMany({
       where: { status: { notIn: ["CANCELLED"] }, orderDate: { gte: historyStart } },
       select: { amount: true, orderDate: true, createdAt: true },
-    }),
-    prisma.order.findMany({
-      where: { weight: { not: null }, weightAddedAt: { gte: historyStart }, status: { notIn: ["CANCELLED"] } },
-      select: { weight: true, weightAddedAt: true },
     }),
     prisma.order.findMany({
       take: 5,
@@ -602,7 +643,13 @@ export async function getDashboardStats() {
     }),
   ]);
 
-  const totalTransport = allWeights.reduce((sum, o) => sum + calculateWeightCharge(o.weight, weightRate), 0);
+  // Per-kg fees are dated when the weight is entered; luxury fees (% of the amount) at the order date.
+  const feeRows = feeOrders.map((o) => ({
+    fee: orderShippingFee(o, weightRate),
+    weight: o.articleType === "LUXE" ? null : o.weight,
+    date: o.articleType === "LUXE" ? o.orderDate : o.weightAddedAt,
+  }));
+  const totalTransport = feeRows.reduce((sum, row) => sum + row.fee, 0);
 
   return {
     totalOrders,
@@ -613,8 +660,7 @@ export async function getDashboardStats() {
     publishedTestimonials,
     totalRevenue: totalRevenueAgg._sum.amount ?? 0,
     totalTransport,
-    weightRate,
-    periods: buildDashboardPeriods(revenueRows, weightRows, weightRate, now),
+    periods: buildDashboardPeriods(revenueRows, feeRows, now),
     recentOrders,
     recentMessages,
   };
@@ -627,17 +673,29 @@ export async function getUnreadMessageCount() {
 }
 
 // ─── ADMIN GETTERS ────────────────────────────────────────────────────────────
-function buildOrderWhere(params: OrderListParams): Prisma.OrderWhereInput {
+async function buildOrderWhere(params: OrderListParams): Promise<Prisma.OrderWhereInput> {
   const and: Prisma.OrderWhereInput[] = [];
   if (params.search) {
-    and.push({
-      OR: [
-        { trackingNumber: { contains: params.search } },
-        { customerName: { contains: params.search } },
-        { customerPhone: { contains: params.search } },
-        { storeOrderNumber: { contains: params.search } },
-      ],
-    });
+    const contains = { contains: params.search };
+    const or: Prisma.OrderWhereInput[] = [
+      { trackingNumber: contains },
+      { customerName: contains },
+      { customerPhone: contains },
+      { storeOrderNumber: contains },
+      { storeName: contains },
+      { destinationCity: contains },
+    ];
+    // Phones are stored as typed ("+225 07 00 00 …"): compare digits only, so "0700" finds them too.
+    const digits = params.search.replace(/\D/g, "");
+    if (digits.length >= 4 && /^[\d\s+().-]+$/.test(params.search)) {
+      const rows = await prisma.$queryRaw<{ id: string }[]>`
+        SELECT id FROM orders
+        WHERE REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(customerPhone, ' ', ''), '+', ''), '-', ''), '.', ''), '(', ''), ')', '')
+          LIKE ${`%${digits}%`}
+        LIMIT 1000`;
+      if (rows.length) or.push({ id: { in: rows.map((row) => row.id) } });
+    }
+    and.push({ OR: or });
   }
   if (params.status) and.push({ status: params.status });
   if (params.destination) and.push({ destinationCity: params.destination });
@@ -660,13 +718,13 @@ function buildOrderSort(params: OrderListParams): Prisma.OrderOrderByWithRelatio
 export async function adminListOrders(rawParams: unknown) {
   await requireViewer();
   const params = parseOrderListParams((rawParams ?? {}) as Record<string, unknown>);
-  const where = buildOrderWhere(params);
+  const where = await buildOrderWhere(params);
 
   const total = await prisma.order.count({ where });
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
   const page = Math.min(params.page, totalPages);
 
-  const [orders, totalOrders, delivered, phones, destinations, standardShippingRate] = await Promise.all([
+  const [orders, totalOrders, delivered, phones, destinations, shippingRates, lastOrder] = await Promise.all([
     prisma.order.findMany({
       where,
       orderBy: buildOrderSort(params),
@@ -678,14 +736,31 @@ export async function adminListOrders(rawParams: unknown) {
     prisma.order.count({ where: { status: "DELIVERED" } }),
     prisma.order.groupBy({ by: ["customerPhone"] }),
     prisma.order.groupBy({ by: ["destinationCity"], orderBy: { destinationCity: "asc" } }),
-    prisma.shippingRate.findFirst({
-      where: { pricingType: "PER_KG", isActive: true, price: { not: null } },
+    prisma.shippingRate.findMany({
+      where: { isActive: true, pricingType: { in: ["PER_KG", "PERCENTAGE"] } },
       orderBy: { displayOrder: "asc" },
-      select: { price: true },
+      select: { id: true, name: true, pricingType: true, price: true, percentage: true },
+    }),
+    // The "previous order" is the last one created; its number is incremented for the next one.
+    prisma.order.findFirst({
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      select: { trackingNumber: true },
     }),
   ]);
 
   const uniqueClients = new Set(phones.map((p) => normalizePhone(p.customerPhone))).size;
+  const kgRates = shippingRates.flatMap((rate) =>
+    rate.pricingType === "PER_KG" && rate.price !== null ? [{ id: rate.id, name: rate.name, price: rate.price }] : [],
+  );
+  const luxePercent = shippingRates.find((rate) => rate.pricingType === "PERCENTAGE" && rate.percentage !== null)?.percentage ?? null;
+
+  // Skip numbers already taken (one typed by hand ahead of the sequence), so the prefilled one always saves.
+  let nextNumber = nextTrackingNumber(lastOrder?.trackingNumber);
+  for (let i = 0; i < 50; i++) {
+    const taken = await prisma.order.findUnique({ where: { trackingNumber: nextNumber }, select: { id: true } });
+    if (!taken) break;
+    nextNumber = nextTrackingNumber(nextNumber);
+  }
 
   return {
     params: { ...params, page },
@@ -699,7 +774,11 @@ export async function adminListOrders(rawParams: unknown) {
       uniqueClients,
     },
     destinations: destinations.map((d) => d.destinationCity).filter(Boolean),
-    weightRate: standardShippingRate?.price ?? 0,
+    // Default per-kg price for old orders that have no frozen rate.
+    weightRate: kgRates[0]?.price ?? 0,
+    kgRates,
+    luxePercent,
+    nextTrackingNumber: nextNumber,
   };
 }
 
@@ -708,7 +787,7 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
   const params = parseOrderListParams((rawParams ?? {}) as Record<string, unknown>);
 
   const orders = await prisma.order.findMany({
-    where: buildOrderWhere(params),
+    where: await buildOrderWhere(params),
     orderBy: buildOrderSort(params),
     take: ORDER_EXPORT_MAX_ROWS + 1,
     select: {
@@ -724,6 +803,9 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
       packageCount: true,
       weight: true,
       weightAddedAt: true,
+      articleType: true,
+      kgRate: true,
+      luxePercent: true,
     },
   });
 
@@ -734,6 +816,7 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
     csvRow([
       "N° Suivi", "Client", "Téléphone", "N° commande boutique", "Ville", "Pays",
       "Statut", "Date", "Heure", "Montant (FCFA)", "Colis", "Poids (kg)", "Date ajout poids",
+      "Type d'articles", "Frais de transport (FCFA)",
     ]),
     ...rows.map((o) => {
       const { date, time } = formatOrderDateTime(o.createdAt);
@@ -742,6 +825,7 @@ export async function adminExportOrdersCsv(rawParams: unknown) {
         o.destinationCity, o.destinationCountry, ORDER_STATUS_LABELS[o.status] ?? o.status,
         date, time, o.amount, o.packageCount, o.weight,
         o.weightAddedAt ? formatOrderDateTime(o.weightAddedAt).date : null,
+        ARTICLE_TYPE_LABELS[o.articleType], orderShippingFee(o) || null,
       ]);
     }),
   ];

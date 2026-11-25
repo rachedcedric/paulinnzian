@@ -1,6 +1,6 @@
-import { OrderStatus, PricingType, MessageStatus, Role } from "@prisma/client";
+import { ArticleType, OrderStatus, PricingType, MessageStatus, Role } from "@prisma/client";
 
-export type { OrderStatus, PricingType, MessageStatus, Role };
+export type { ArticleType, OrderStatus, PricingType, MessageStatus, Role };
 
 export interface Store {
   id: string;
@@ -54,6 +54,9 @@ export interface Order {
   packageCount: number | null;
   weight: number | null;
   weightAddedAt: Date | null;
+  articleType: ArticleType;
+  kgRate: number | null;
+  luxePercent: number | null;
   destinationCity: string;
   destinationCountry: string;
   internalNotes: string | null;
@@ -136,6 +139,7 @@ export interface SiteSettings {
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: "En attente",
   PURCHASED: "Commande effectuée",
+  SHIPPED_PARIS: "Expédié vers Paris",
   RECEIVED_PARIS: "Reçu à Paris",
   SHIPPED_DESTINATION: "Expédié vers la destination",
   ARRIVED_DESTINATION: "Arrivé à destination",
@@ -146,11 +150,17 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   PENDING: "text-yellow-600 bg-yellow-50",
   PURCHASED: "text-blue-600 bg-blue-50",
+  SHIPPED_PARIS: "text-orange-600 bg-orange-50",
   RECEIVED_PARIS: "text-purple-600 bg-purple-50",
   SHIPPED_DESTINATION: "text-pink-600 bg-pink-50",
   ARRIVED_DESTINATION: "text-teal-600 bg-teal-50",
   DELIVERED: "text-green-600 bg-green-50",
   CANCELLED: "text-red-600 bg-red-50",
+};
+
+export const ARTICLE_TYPE_LABELS: Record<ArticleType, string> = {
+  STANDARD: "Standard",
+  LUXE: "Luxe",
 };
 
 export const STORE_CATEGORIES = [

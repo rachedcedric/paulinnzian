@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { getUnreadMessageCount } from "@/actions/admin";
-import { Toaster } from "sonner";
 
 export default async function AdminDashboardLayout({
   children,
@@ -17,16 +16,14 @@ export default async function AdminDashboardLayout({
     return 0;
   });
 
+  // Toasts are rendered by the root layout's <Toaster>; a second one here showed every message twice.
   return (
-    <>
-      <AdminShell
-        role={(session.user as { role?: string }).role}
-        name={session.user.name || "Administrateur"}
-        unreadMessages={unreadMessages}
-      >
-        {children}
-      </AdminShell>
-      <Toaster richColors position="top-right" />
-    </>
+    <AdminShell
+      role={(session.user as { role?: string }).role}
+      name={session.user.name || "Administrateur"}
+      unreadMessages={unreadMessages}
+    >
+      {children}
+    </AdminShell>
   );
 }
