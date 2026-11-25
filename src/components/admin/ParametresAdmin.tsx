@@ -10,6 +10,8 @@ const generalFields = [
   { key: "site_slogan", label: "Slogan" },
   { key: "whatsapp_number", label: "WhatsApp (numéro)" },
   { key: "whatsapp_link", label: "WhatsApp (lien)" },
+  { key: "whatsapp_channel_url", label: "Chaîne WhatsApp (lien)" },
+  { key: "whatsapp_group_url", label: "Groupe WhatsApp (lien)" },
   { key: "phone_ci", label: "Téléphone CI" },
   { key: "address_paris", label: "Adresse Paris" },
   { key: "address_abidjan", label: "Adresse Abidjan" },

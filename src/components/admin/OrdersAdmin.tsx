@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { adminExportOrdersCsv, deleteOrder } from "@/actions/admin";
 import {
-  ORDER_STATUSES, buildOrderListQuery, formatOrderDateTime, hasActiveOrderFilters,
+  ORDER_SELECTABLE_STATUSES, buildOrderListQuery, formatOrderDateTime, hasActiveOrderFilters,
   type OrderListParams, type OrderSortKey,
 } from "@/lib/order-list";
 import { countryFlag } from "@/lib/country-flag";
@@ -17,7 +17,7 @@ import { ORDER_STATUS_LABELS } from "@/types";
 import type { Order } from "@/types";
 import { OrderStatusBadge } from "./OrderStatusBadge";
 import { OrdersPagination } from "./OrdersPagination";
-import { OrderFormModal } from "./OrderFormModal";
+import { OrderFormModal, type KgRateOption } from "./OrderFormModal";
 import { OrderTrackingModal } from "./OrderTrackingModal";
 import { OrderWeightModal } from "./OrderWeightModal";
 
@@ -29,7 +29,16 @@ export interface OrdersAdminProps {
   stats: { total: number; inProgress: number; delivered: number; uniqueClients: number };
   destinations: string[];
   weightRate: number;
+  kgRates: KgRateOption[];
+  luxePercent: number | null;
+  nextTrackingNumber: string;
   canManage: boolean;
+}
+
+/** "Luxe · 10 %" or "15 000 F/kg", shown under the tracking number. */
+function pricingLabel(order: Order) {
+  if (order.articleType === "LUXE") return `Luxe · ${nf.format(order.luxePercent ?? 0)} %`;
+  return order.kgRate != null ? `${nf.format(order.kgRate)} F/kg` : null;
 }
 
 const nf = new Intl.NumberFormat("fr-FR");
@@ -45,7 +54,9 @@ const COLUMNS: { key: OrderSortKey; label: string; align?: "right" }[] = [
   { key: "amount", label: "Montant", align: "right" },
 ];
 
-export function OrdersAdmin({ orders, params, total, totalPages, stats, destinations, weightRate, canManage }: OrdersAdminProps) {
+export function OrdersAdmin({
+  orders, params, total, totalPages, stats, destinations, weightRate, kgRates, luxePercent, nextTrackingNumber, canManage,
+}: OrdersAdminProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
@@ -232,7 +243,7 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           maxLength={100}
-          placeholder="Rechercher une commande, un client, un numéro de suivi..."
+          placeholder="Rechercher : n° de suivi, client, téléphone, boutique, ville..."
           aria-label="Rechercher une commande"
           className="h-12 w-full rounded-xl border border-gray-200 bg-white pl-11 pr-4 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D99A12]"
         />
@@ -262,7 +273,7 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
           Statut
           <select value={draft.status} onChange={(e) => setDraft({ ...draft, status: e.target.value })} className={`${field} mt-1 font-normal`}>
             <option value="">Tous les statuts</option>
-            {ORDER_STATUSES.map((s) => <option key={s} value={s}>{ORDER_STATUS_LABELS[s]}</option>)}
+            {ORDER_SELECTABLE_STATUSES.map((s) => <option key={s} value={s}>{ORDER_STATUS_LABELS[s]}</option>)}
           </select>
         </label>
         <label className="text-xs font-semibold text-gray-500">
@@ -332,7 +343,10 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
                     const { date, time } = formatOrderDateTime(order.createdAt);
                     return (
                       <tr key={order.id} className="border-b border-gray-50 hover:bg-gray-50/60">
-                        <td className="px-4 py-3 font-mono text-sm font-bold text-[#D99A12]">{order.trackingNumber}</td>
+                        <td className="px-4 py-3">
+                          <p className="font-mono text-sm font-bold text-[#D99A12]">{order.trackingNumber}</p>
+                          <p className="text-xs text-gray-400">{pricingLabel(order)}</p>
+                        </td>
                         <td className="px-4 py-3">
                           <p className="font-semibold text-gray-900">{order.customerName}</p>
                           <p className="text-xs text-gray-400">{order.customerPhone}</p>
@@ -410,6 +424,9 @@ export function OrdersAdmin({ orders, params, total, totalPages, stats, destinat
       {showForm && (
         <OrderFormModal
           editing={editing}
+          kgRates={kgRates}
+          luxePercent={luxePercent}
+          nextTrackingNumber={nextTrackingNumber}
           onClose={() => setShowForm(false)}
           onSaved={() => { setShowForm(false); refresh(); }}
         />

@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/home/HeroSection";
 import { HowToOrderSection } from "@/components/home/HowToOrderSection";
 import { StoresBand } from "@/components/home/StoresBand";
+import { PartnerStores } from "@/components/home/PartnerStores";
 import { TarifsTeaserSection } from "@/components/home/TarifsTeaserSection";
 import { ComparisonSection } from "@/components/home/ComparisonSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
@@ -21,6 +22,7 @@ export default async function HomePage() {
   return (
     <>
       <HeroSection stores={stores} />
+      <PartnerStores stores={stores} />
       <HowToOrderSection />
       <StoresBand stores={stores} />
       <TarifsTeaserSection shippingRates={shippingRates} />

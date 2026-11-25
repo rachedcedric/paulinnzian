@@ -15,6 +15,8 @@ interface LayoutWrapperProps {
   tiktokUrl: string;
   whatsappUrl: string;
   whatsappNumber: string;
+  whatsappChannelUrl: string;
+  whatsappGroupUrl: string;
   phoneCi: string;
   addressParis: string;
   addressAbidjan: string;

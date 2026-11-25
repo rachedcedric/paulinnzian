@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Search, ExternalLink, ShoppingBag } from "lucide-react";
 import type { Store } from "@/types";
 import { STORE_CATEGORIES } from "@/types";
+import { PartnerStores } from "@/components/home/PartnerStores";
 
 export function StoresClient({ initialStores }: { initialStores: Store[] }) {
   const [search, setSearch] = useState("");
@@ -34,6 +35,8 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
           </motion.div>
         </div>
       </div>
+
+      <PartnerStores stores={initialStores} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Search */}

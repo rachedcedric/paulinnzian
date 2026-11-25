@@ -100,6 +100,10 @@ export default async function RootLayout({
           tiktokUrl={settings.tiktok_url || "https://www.tiktok.com/@paulinnzianofficiel"}
           whatsappUrl={settings.whatsapp_link || "https://wa.me/33637036839"}
           whatsappNumber={settings.whatsapp_number || "+33 6 37 03 68 39"}
+          whatsappChannelUrl={settings.whatsapp_channel_url || "https://whatsapp.com/channel/0029VbDg7mxBfxo0wYkvON0c"}
+          whatsappGroupUrl={
+            settings.whatsapp_group_url || "https://chat.whatsapp.com/HiYx6A1zEkZ9YseXXxgV71?s=cl&p=i&mlu=4&ilr=4&iam=2"
+          }
           phoneCi={settings.phone_ci || "+225 07 77 06 13 30"}
           addressParis={settings.address_paris || "Paris 18ème arrondissement"}
           addressAbidjan={settings.address_abidjan || "Cocody Faya, Abidjan"}

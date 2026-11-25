@@ -6,6 +6,7 @@ import {
   orderSchema,
   orderWeightSchema,
   shippingRateUpdateSchema,
+  storeSchema,
   trackingEventSchema,
   trackingLookupSchema,
 } from "../src/lib/validations";
@@ -31,6 +32,12 @@ test("tariff updates reject non-finite and out-of-range values", () => {
   assert.equal(shippingRateUpdateSchema.safeParse({ id: "standard", price: 9_800 }).success, true);
 });
 
+test("store links must be http(s): they are rendered as hrefs", () => {
+  const store = { name: "Temu", slug: "temu", category: "Marketplace", websiteUrl: "https://www.temu.com/fr" };
+  assert.equal(storeSchema.safeParse(store).success, true);
+  assert.equal(storeSchema.safeParse({ ...store, websiteUrl: "javascript:alert(1)" }).success, false);
+});
+
 test("orders and tracking events require valid business dates", () => {
   const order = {
     trackingNumber: "pnz-2026-001",
@@ -42,6 +49,10 @@ test("orders and tracking events require valid business dates", () => {
     orderDate: "2026-08-10",
   };
   assert.equal(orderSchema.parse(order).trackingNumber, "PNZ-2026-001");
+  assert.equal(orderSchema.parse(order).articleType, "STANDARD");
+  assert.equal(orderSchema.safeParse({ ...order, status: "SHIPPED_PARIS", articleType: "LUXE" }).success, true);
+  assert.equal(orderSchema.safeParse({ ...order, articleType: "GOLD" }).success, false);
+  assert.equal(orderSchema.safeParse({ ...order, shippingRateId: "id' OR 1=1" }).success, false);
   assert.equal(orderSchema.parse({ ...order, weight: "" }).weight, undefined);
   assert.equal(orderSchema.safeParse({ ...order, orderDate: "10/08/2026" }).success, false);
   assert.equal(orderWeightSchema.parse({

@@ -4,6 +4,7 @@ import { MessageCircle } from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 import { SiTiktok } from "react-icons/si";
 import { useSiteConfig } from "./SiteConfigContext";
+import { CommunityLinks } from "./CommunityLinks";
 
 interface FooterProps {
   facebookUrl: string;
@@ -142,6 +143,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
               <MessageCircle className="w-4 h-4" />
               Commander sur WhatsApp
             </a>
+            <CommunityLinks className="mt-4 items-start" />
           </div>
         </div>
 

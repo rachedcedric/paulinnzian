@@ -4,6 +4,7 @@ import { ORDER_STATUS_LABELS } from "@/types";
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-50 text-amber-700 ring-amber-200",
   PURCHASED: "bg-blue-50 text-blue-700 ring-blue-200",
+  SHIPPED_PARIS: "bg-orange-50 text-orange-700 ring-orange-200",
   RECEIVED_PARIS: "bg-violet-50 text-violet-700 ring-violet-200",
   SHIPPED_DESTINATION: "bg-indigo-50 text-indigo-700 ring-indigo-200",
   ARRIVED_DESTINATION: "bg-cyan-50 text-cyan-700 ring-cyan-200",

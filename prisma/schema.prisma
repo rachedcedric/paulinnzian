@@ -15,11 +15,17 @@ enum Role {
 enum OrderStatus {
   PENDING
   PURCHASED
+  SHIPPED_PARIS
   RECEIVED_PARIS
   SHIPPED_DESTINATION
   ARRIVED_DESTINATION
   DELIVERED
   CANCELLED
+}
+
+enum ArticleType {
+  STANDARD
+  LUXE
 }
 
 enum PricingType {
@@ -105,10 +111,14 @@ model Order {
   packageCount       Int?
   weight             Float?
   weightAddedAt      DateTime?
+  articleType        ArticleType     @default(STANDARD)
+  // Price per kg / luxury percentage frozen on the order, so later tariff changes never rewrite past fees.
+  kgRate             Float?
+  luxePercent        Float?
   destinationCity    String          @db.VarChar(100)
   destinationCountry String          @db.VarChar(100)
   internalNotes      String?         @db.Text
-  status             OrderStatus     @default(PENDING)
+  status             OrderStatus     @default(PURCHASED)
   orderDate          DateTime        @default(now())
   trackingEvents     TrackingEvent[]
   createdAt          DateTime        @default(now())

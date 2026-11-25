@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { MapPin, MessageCircle, Phone } from "lucide-react";
 import { useSiteConfig } from "@/components/layout/SiteConfigContext";
+import { CommunityLinks } from "@/components/layout/CommunityLinks";
 
 export function ContactSection() {
   const { whatsappUrl, whatsappNumber, phoneCi, addressParis, addressAbidjan, siteName } = useSiteConfig();
@@ -88,6 +89,7 @@ export function ContactSection() {
                 <MessageCircle className="w-5 h-5" />
                 CONTACTER SUR WHATSAPP
               </a>
+              <CommunityLinks className="mt-3 sm:flex-row" />
             </div>
           </motion.div>
         </div>
