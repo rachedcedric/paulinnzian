@@ -1,13 +1,13 @@
 import Link from "next/link";
 import {
   Package, Store, MessageSquare, Star, TrendingUp, CheckCircle2, Wallet, Truck,
-  ShoppingBag, CircleDollarSign, Boxes, Scale, Banknote,
+  ShoppingBag, CircleDollarSign, Boxes, Scale, Banknote, Euro,
 } from "lucide-react";
 import { getDashboardStats } from "@/actions/admin";
 import { PeriodStatsCard, type PeriodCardData } from "@/components/admin/PeriodStatsCard";
 import { OrderStatusBadge } from "@/components/admin/OrderStatusBadge";
 import { countryFlag } from "@/lib/country-flag";
-import { PERIODS, formatFcfa, formatKg, formatNumber, percentChange, type Period } from "@/lib/dashboard-stats";
+import { PERIODS, exchangeProfit, formatFcfa, formatKg, formatNumber, type Period } from "@/lib/dashboard-stats";
 import { OFFICIAL_FCFA_PER_EUR, ORDERS_TIMEZONE, exchangeMargin, formatOrderDateTime } from "@/lib/order-list";
 import { DEVIS_FCFA_PER_EUR } from "@/lib/devis";
 
@@ -29,20 +29,14 @@ export default async function AdminDashboardPage() {
 
   const revenueData = {} as Record<Period, PeriodCardData>;
   const transportData = {} as Record<Period, PeriodCardData>;
-  // Profit = exchange margin on the order amounts + shipping fees (per kg, or 10 % on luxury items).
+  // Profit = exchange margin only (transport fees are shown in their own card).
   const profitData = {} as Record<Period, PeriodCardData>;
   for (const { key } of PERIODS) {
     const r = stats.periods.revenue[key];
-    const fees = stats.periods.transport[key];
-    const margin = exchangeMargin(r.total);
+    const { euros, ...profit } = exchangeProfit(r);
     profitData[key] = {
-      total: margin + fees.total,
-      change: percentChange(margin + fees.total, exchangeMargin(r.previousTotal) + fees.previousTotal),
-      series: r.series.map((point, i) => ({
-        label: point.label,
-        value: exchangeMargin(point.value) + (fees.series[i]?.value ?? 0),
-      })),
-      minis: [{ value: formatFcfa(margin) }, { value: formatFcfa(fees.total) }],
+      ...profit,
+      minis: [{ value: `${formatNumber(euros)} €` }, { value: formatNumber(r.orders) }],
     };
     revenueData[key] = {
       total: r.total,
@@ -61,9 +55,8 @@ export default async function AdminDashboardPage() {
 
   const ordersLabels = (suffix: string): [string, string] => [`Commandes ${suffix}`, "Panier moyen"];
   const transportLabels = (suffix: string): [string, string] => [`Colis expédiés ${suffix}`, `Poids total ${suffix}`];
-  const marginPerEuro = (DEVIS_FCFA_PER_EUR - OFFICIAL_FCFA_PER_EUR).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
-  const profitLabels: [string, string] = [`Marge de change (${marginPerEuro} F/€)`, "Frais de transport (kg + luxe)"];
-  const totalProfit = exchangeMargin(stats.totalRevenue) + stats.totalTransport;
+  const profitLabels: [string, string] = ["Montant des commandes (€)", "Commandes"];
+  const totalProfit = exchangeMargin(stats.totalRevenue);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -89,13 +82,13 @@ export default async function AdminDashboardPage() {
           <PeriodStatsCard
             title="Mes revenus"
             titleNote={`(1 € = ${DEVIS_FCFA_PER_EUR} F au lieu de ${OFFICIAL_FCFA_PER_EUR.toLocaleString("fr-FR")} F)`}
-            subtitle={`Marge de change + frais de transport · ${formatFcfa(totalProfit)} au total`}
+            subtitle={`Marge de change uniquement : (€ × ${DEVIS_FCFA_PER_EUR}) − (€ × ${OFFICIAL_FCFA_PER_EUR.toLocaleString("fr-FR")}) · ${formatFcfa(totalProfit)} au total`}
             icon={<Banknote className="h-5 w-5" />}
             iconTone="bg-emerald-50 text-emerald-600"
             accent={{ text: "text-emerald-600", tabActive: "bg-emerald-600", bar: "bg-emerald-500" }}
             todayLabel={today}
             data={profitData}
-            miniIcons={[<CircleDollarSign key="a" className="h-5 w-5" />, <Truck key="b" className="h-5 w-5" />]}
+            miniIcons={[<Euro key="a" className="h-5 w-5" />, <ShoppingBag key="b" className="h-5 w-5" />]}
             miniLabels={{ day: profitLabels, week: profitLabels, month: profitLabels, year: profitLabels }}
           />
         </div>

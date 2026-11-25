@@ -1,4 +1,5 @@
-import { ORDERS_TIMEZONE, shiftDate } from "@/lib/order-list";
+import { DEVIS_FCFA_PER_EUR } from "@/lib/devis";
+import { ORDERS_TIMEZONE, exchangeMargin, shiftDate } from "@/lib/order-list";
 
 /**
  * Pure dashboard aggregation (no DB access) so it can be unit-tested.
@@ -166,6 +167,17 @@ function buildSeries(period: Period, today: string, points: Point[]): SeriesPoin
 export function percentChange(current: number, previous: number): number | null {
   if (!Number.isFinite(current) || !Number.isFinite(previous) || previous <= 0) return null;
   return Math.round(((current - previous) / previous) * 100);
+}
+
+/** "Mes revenus": exchange margin only, (€ × 670) − (€ × 655.96), on order amounts stored in F CFA at 670. */
+export function exchangeProfit(revenue: PeriodRevenue) {
+  const total = exchangeMargin(revenue.total);
+  return {
+    total,
+    change: percentChange(total, exchangeMargin(revenue.previousTotal)),
+    series: revenue.series.map((p) => ({ label: p.label, value: exchangeMargin(p.value) })),
+    euros: revenue.total / DEVIS_FCFA_PER_EUR,
+  };
 }
 
 export function buildDashboardPeriods(

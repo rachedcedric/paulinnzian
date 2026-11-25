@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildDashboardPeriods, formatFcfa, niceAxisMax, percentChange } from "../src/lib/dashboard-stats";
+import { buildDashboardPeriods, exchangeProfit, formatFcfa, niceAxisMax, percentChange } from "../src/lib/dashboard-stats";
 import { calculateWeightCharge } from "../src/lib/order-list";
 
 // 2026-09-18 15:30 Paris (CEST = UTC+2)
@@ -84,4 +84,20 @@ test("helpers", () => {
   assert.equal(niceAxisMax(161837), 200000);
   assert.equal(niceAxisMax(0), 4);
   assert.equal(formatFcfa(2311125).replace(/\s/g, " "), "2 311 125 F CFA");
+});
+
+test("Mes revenus = exchange margin only: (€ × 670) − (€ × 655.96)", () => {
+  // 100 € order stored as 67 000 F CFA → 67 000 − 65 596 = 1 404 F CFA; no transport fee added.
+  const profit = exchangeProfit({
+    total: 67_000,
+    previousTotal: 33_500,
+    orders: 1,
+    average: 67_000,
+    series: [{ label: "10h", value: 67_000 }, { label: "11h", value: 0 }],
+    change: null,
+  });
+  assert.equal(profit.total, 1_404);
+  assert.equal(profit.euros, 100);
+  assert.equal(profit.change, 100);
+  assert.deepEqual(profit.series, [{ label: "10h", value: 1_404 }, { label: "11h", value: 0 }]);
 });
