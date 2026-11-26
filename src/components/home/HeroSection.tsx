@@ -1,36 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { MessageCircle, Calculator, Crown, ShieldCheck, Truck, Headset } from "lucide-react";
+import { MessageCircle, Calculator, PackageSearch } from "lucide-react";
 import { useSiteConfig } from "@/components/layout/SiteConfigContext";
+import { DEVIS_FCFA_PER_EUR, formatFcfa } from "@/lib/devis";
 import { HeroVisual } from "./HeroVisual";
-import type { Store } from "@/types";
 
-const ADVANTAGES = [
-  {
-    icon: Crown,
-    title: "Zéro frais de commission",
-    text: "Vous payez le prix exact de vos paniers.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Achats sécurisés",
-    text: "Paiement sécurisé avec notre moyen de paiement.",
-  },
-  {
-    icon: Truck,
-    title: "Livraison rapide",
-    text: "Paris → Abidjan & Dakar.",
-  },
-  {
-    icon: Headset,
-    title: "Suivi personnalisé",
-    text: "Du panier à la réception de vos colis.",
-  },
-];
+export interface PerKgRate {
+  name: string;
+  price: number;
+}
 
-export function HeroSection({ stores }: { stores: Store[] }) {
+/** The three numbers that make the price: shown as a receipt so the saving reads in one glance. */
+function PriceReceipt({ perKgRate }: { perKgRate: PerKgRate | null }) {
+  const lines = [
+    { label: "Commission sur votre panier", value: "0 FCFA" },
+    { label: "Taux unique, toutes boutiques", value: `1 € = ${DEVIS_FCFA_PER_EUR} FCFA` },
+    ...(perKgRate
+      ? [{ label: `Transport ${perKgRate.name.toLowerCase()} vers Abidjan & Dakar`, value: `${formatFcfa(perKgRate.price)}/kg` }]
+      : []),
+  ];
+
+  return (
+    <dl className="mt-7 max-w-xl border-y border-dashed border-white/25 py-3">
+      {lines.map((line) => (
+        <div key={line.label} className="flex items-baseline gap-2 py-1.5">
+          <dt className="flex flex-1 items-baseline gap-2 text-sm text-gray-300 sm:text-base">
+            {line.label}
+            <span aria-hidden className="min-w-4 flex-1 border-b border-dotted border-white/30" />
+          </dt>
+          <dd className="shrink-0 text-base font-black tabular-nums text-gold sm:text-lg">{line.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function HeroSection({ perKgRate }: { perKgRate: PerKgRate | null }) {
   const {
     whatsappUrl,
     heroEyebrow,
@@ -45,78 +51,65 @@ export function HeroSection({ stores }: { stores: Store[] }) {
   } = useSiteConfig();
 
   return (
-    <section className="relative overflow-hidden bg-[#FAFAF8] pt-20">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-[#D99A12] mb-4">
-              {heroEyebrow}
-            </p>
+    <section
+      aria-labelledby="hero-title"
+      className="relative overflow-hidden bg-ink pt-20 text-white [--focus-ring:var(--gold)]"
+    >
+      {/* Soft gold glow behind the headline */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-40 -top-40 h-[32rem] w-[32rem] rounded-full bg-gold/15 blur-3xl"
+      />
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight text-black mb-4">
-              {heroTitle}{" "}
-              <span className="font-display italic text-[#D99A12] font-normal">{heroTitleHighlight}</span>
-              <br />
-              {heroTitleAfter}
-            </h1>
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-14 pt-8 sm:px-6 sm:pt-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-14 lg:px-8 lg:pb-20 lg:pt-14">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold sm:text-sm">{heroEyebrow}</p>
 
-            <p className="font-script font-semibold text-2xl sm:text-3xl text-[#071225] mb-5">
-              {heroTagline}
-            </p>
-
-            <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed max-w-xl">
-              {heroSubtitle}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#D99A12] hover:bg-[#C8912D] text-white font-bold px-8 py-4 rounded-full text-base transition-all hover:shadow-lg hover:scale-[1.02] min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#090B10]"
-              >
-                <MessageCircle className="w-5 h-5" />
-                {heroCtaPrimary}
-                <span aria-hidden="true">→</span>
-              </a>
-              <Link
-                href="/devis-achat"
-                className="inline-flex items-center justify-center gap-2 bg-white border-2 border-[#090B10] text-[#090B10] hover:bg-[#090B10] hover:text-white font-bold px-8 py-4 rounded-full text-base transition-all min-h-[44px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D99A12]"
-              >
-                <Calculator className="w-5 h-5" />
-                {heroCtaSecondary}
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
+          <h1
+            id="hero-title"
+            className="mt-4 text-[2.5rem] font-black leading-[1.04] tracking-tight sm:text-6xl xl:text-7xl"
           >
-            <HeroVisual stores={stores} image={heroImage} />
-          </motion.div>
-        </div>
-      </div>
+            {heroTitle} <span className="font-display font-normal italic text-gold">{heroTitleHighlight}</span>{" "}
+            {heroTitleAfter}
+          </h1>
 
-      {/* Avantages */}
-      <div className="relative bg-[#090B10]/95">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {ADVANTAGES.map((item) => (
-              <div key={item.title} className="flex flex-col items-center text-center gap-2 sm:flex-row sm:text-left">
-                <div className="w-10 h-10 rounded-full bg-[#D99A12]/15 flex items-center justify-center shrink-0">
-                  <item.icon className="w-5 h-5 text-[#D99A12]" />
-                </div>
-                <div>
-                  <p className="font-bold text-white text-xs sm:text-sm leading-tight">{item.title}</p>
-                  <p className="text-gray-400 text-[11px] sm:text-xs mt-0.5">{item.text}</p>
-                </div>
-              </div>
-            ))}
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-300 sm:text-lg">{heroSubtitle}</p>
+
+          <PriceReceipt perKgRate={perKgRate} />
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-gold px-7 py-4 text-base font-bold text-ink transition hover:bg-gold-premium hover:shadow-lg hover:shadow-gold/20"
+            >
+              <MessageCircle className="h-5 w-5" aria-hidden />
+              {heroCtaPrimary}
+              <span className="sr-only">(WhatsApp, nouvel onglet)</span>
+            </a>
+            <Link
+              href="/devis-achat"
+              className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border-2 border-white/80 px-7 py-4 text-base font-bold text-white transition hover:bg-white hover:text-ink"
+            >
+              <Calculator className="h-5 w-5" aria-hidden />
+              {heroCtaSecondary}
+            </Link>
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+            <p className="font-script text-2xl font-semibold leading-tight text-gold">{heroTagline}</p>
+            <Link
+              href="/suivi"
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-gray-300 underline underline-offset-4 hover:text-white"
+            >
+              <PackageSearch className="h-4 w-4" aria-hidden />
+              Déjà client ? Suivre mon colis
+            </Link>
           </div>
         </div>
+
+        <HeroVisual image={heroImage} />
       </div>
     </section>
   );

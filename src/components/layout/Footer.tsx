@@ -25,7 +25,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-black text-white pt-16 pb-44 sm:pb-8">
+    <footer className="bg-black text-white pt-16 pb-44 sm:pb-8 [--focus-ring:var(--gold)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
@@ -44,7 +44,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 aria-label="WhatsApp"
                 className="w-9 h-9 bg-[#25D366] rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
               >
-                <MessageCircle className="w-4 h-4 text-white" />
+                <MessageCircle className="w-4 h-4 text-ink" aria-hidden />
               </a>
               <a
                 href={instagramUrl}
@@ -54,7 +54,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 title="Instagram"
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#E4405F] transition-colors"
               >
-                <FaInstagram className="w-4 h-4 text-white" />
+                <FaInstagram className="w-4 h-4 text-white" aria-hidden />
               </a>
               <a
                 href={facebookUrl}
@@ -64,7 +64,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 title="Facebook"
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#1877F2] transition-colors"
               >
-                <FaFacebookF className="w-4 h-4 text-white" />
+                <FaFacebookF className="w-4 h-4 text-white" aria-hidden />
               </a>
               <a
                 href={tiktokUrl}
@@ -74,7 +74,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 title="TikTok"
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white transition-colors group"
               >
-                <SiTiktok className="w-4 h-4 text-white group-hover:text-black" />
+                <SiTiktok className="w-4 h-4 text-white group-hover:text-black" aria-hidden />
               </a>
             </div>
           </div>
@@ -108,21 +108,21 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
             <h3 className="font-semibold text-white mb-4">Contact</h3>
             <ul className="space-y-3 text-sm text-gray-400">
               <li>
-                <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Bureau Paris</p>
+                <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Bureau Paris</p>
                 <p>{addressParis}</p>
               </li>
               <li>
-                <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Bureau Abidjan</p>
+                <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Bureau Abidjan</p>
                 <p>{addressAbidjan}</p>
               </li>
               <li>
-                <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">WhatsApp</p>
+                <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">WhatsApp</p>
                 <a href={whatsappUrl} className="hover:text-[#25D366] transition-colors">
                   {whatsappNumber}
                 </a>
               </li>
               <li>
-                <p className="text-gray-500 text-xs uppercase tracking-wide mb-1">Appels & SMS</p>
+                <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Appels & SMS</p>
                 <p>{phoneCi}</p>
               </li>
             </ul>
@@ -138,9 +138,9 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white text-sm font-semibold px-5 py-3 rounded-full transition-all"
+              className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-ink text-sm font-bold px-5 py-3 rounded-full transition-all"
             >
-              <MessageCircle className="w-4 h-4" />
+              <MessageCircle className="w-4 h-4" aria-hidden />
               Commander sur WhatsApp
             </a>
             <CommunityLinks className="mt-4 items-start" />
@@ -149,35 +149,37 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
 
         <div className="mb-8 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
           <div>
-            <p className="text-center text-xs font-semibold uppercase text-gray-500 sm:text-left">
+            <p className="text-center text-xs font-semibold uppercase text-gray-400 sm:text-left">
               Partenaire transport
             </p>
-            <p className="mt-1 text-center text-sm text-gray-400 sm:text-left">
+            <p className="mt-1 text-center text-sm text-gray-300 sm:text-left">
               Expédition et acheminement avec Alizé Fret
             </p>
           </div>
+          {/* Text wordmark, not an <img>: the old lazy SVG relied on fonts phones do not have, and next/image
+              hides alt text, so whenever the image was not painted the box stayed empty. Text always renders. */}
           <a
             href="https://alizefret.com/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Visiter le site d'Alizé Fret, partenaire transport"
-            className="block w-52 rounded-lg bg-white px-4 py-3 transition-opacity hover:opacity-90 sm:w-56"
+            className="inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3 transition-opacity hover:opacity-90"
           >
-            <Image
-              src="/alizefret-logo.svg"
-              alt="Alizé Fret"
-              width={400}
-              height={100}
-              className="h-auto w-full"
-            />
+            <span className="font-display text-3xl italic leading-none text-[#1565C0]">alizé</span>
+            <span className="flex flex-col items-start leading-none">
+              <span className="text-2xl font-black tracking-[0.12em] text-[#0D47A1]">FRET</span>
+              <span className="mt-1 bg-[#0D47A1] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.14em] text-white">
+                ENVOI COLIS GP
+              </span>
+            </span>
+            <span className="sr-only">(site du partenaire transport, nouvel onglet)</span>
           </a>
         </div>
 
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             © {year} Paulin N'ZIAN - Personal Shopper. Tous droits réservés.
           </p>
-          <div className="flex gap-4 text-sm text-gray-500">
+          <div className="flex gap-4 text-sm text-gray-400">
             <Link href="/mentions-legales" className="hover:text-gray-300 transition-colors">
               Mentions légales
             </Link>

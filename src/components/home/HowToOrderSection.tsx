@@ -1,32 +1,26 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Link as LinkIcon, CreditCard, Plane, PackageCheck, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { Link as LinkIcon, CreditCard, Plane, PackageCheck, CheckCircle2, ArrowRight } from "lucide-react";
 
 const steps = [
   {
     icon: LinkIcon,
-    number: "1",
     title: "Partagez vos liens",
-    description: "Envoyez-moi vos paniers ou liens d'articles depuis les boutiques en ligne de votre choix.",
+    description: "Envoyez-moi sur WhatsApp vos paniers ou liens d'articles, depuis les boutiques de votre choix.",
   },
   {
     icon: CreditCard,
-    number: "2",
-    title: "Je m'occupe des achats",
+    title: "J'achète pour vous",
     description: "Je valide vos commandes avec mon moyen de paiement, sans frais cachés ni commission.",
   },
   {
     icon: Plane,
-    number: "3",
     title: "Expédition depuis Paris",
     description: "Vos colis sont regroupés et expédiés vers Abidjan et Dakar en toute sécurité.",
   },
   {
     icon: PackageCheck,
-    number: "4",
-    title: "Réception de vos colis",
-    description: "Vous recevez vos commandes et pouvez suivre leur progression.",
+    title: "Vous recevez",
+    description: "Vous suivez votre commande en ligne jusqu'à la réception de vos colis.",
   },
 ];
 
@@ -39,66 +33,47 @@ const trustPoints = [
 
 export function HowToOrderSection() {
   return (
-    <section className="overflow-hidden bg-white py-12 sm:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={false}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center sm:mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">Comment ça marche ?</h2>
-        </motion.div>
-
-        <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
-          {/* Steps */}
-          <motion.div
-            initial={false}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-[#FAFAF8] rounded-3xl p-6 sm:p-8"
+    <section aria-labelledby="how-title" className="bg-ink py-16 text-white sm:py-20 [--focus-ring:var(--gold)]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold sm:text-sm">Simple comme un message</p>
+            <h2 id="how-title" className="mt-3 text-3xl font-black tracking-tight sm:text-5xl">
+              Comment ça marche ?
+            </h2>
+          </div>
+          <Link
+            href="/comment-ca-marche"
+            className="inline-flex items-center gap-2 font-semibold text-gray-300 underline underline-offset-4 hover:text-white"
           >
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {steps.map((step, i) => (
-                <motion.div
-                  key={step.number}
-                  initial={false}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex flex-col items-center text-center"
-                >
-                  <div className="relative w-16 h-16 bg-white border-2 border-[#D99A12]/30 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-                    <step.icon className="w-7 h-7 text-[#D99A12]" />
-                    <span className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-[#090B10] text-white text-xs font-black flex items-center justify-center">
-                      {step.number}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-black text-base mb-2">{step.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Trust sidebar */}
-          <motion.div
-            initial={false}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-[#FBF3E1] border border-[#D99A12]/30 rounded-3xl p-6 sm:p-8"
-          >
-            <h3 className="font-black text-black text-lg mb-5">Pourquoi me faire confiance ?</h3>
-            <ul className="space-y-4">
-              {trustPoints.map((point) => (
-                <li key={point} className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-5 h-5 text-[#D99A12] shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700 font-medium">{point}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+            Tout le détail
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
         </div>
+
+        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => (
+            <li key={step.title} className="relative flex gap-5 rounded-3xl bg-white/5 p-5 ring-1 ring-white/10 sm:block sm:p-6">
+              <span aria-hidden className="w-8 shrink-0 font-display text-5xl italic leading-none text-gold sm:text-6xl">
+                {i + 1}
+              </span>
+              <step.icon className="absolute right-6 top-7 hidden h-6 w-6 text-gray-400 sm:block" aria-hidden />
+              <div>
+                <h3 className="text-lg font-bold sm:mt-4">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-300">{step.description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <ul className="mt-10 grid gap-3 border-t border-white/10 pt-8 sm:grid-cols-2 lg:grid-cols-4">
+          {trustPoints.map((point) => (
+            <li key={point} className="flex items-center gap-2.5 text-sm font-semibold text-gray-200">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-gold" aria-hidden />
+              {point}
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

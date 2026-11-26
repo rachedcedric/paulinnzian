@@ -1,123 +1,66 @@
-"use client";
-
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect } from "react";
-import type { Testimonial } from "@/types";
 import Image from "next/image";
+import { Star } from "lucide-react";
+import type { Testimonial } from "@/types";
 
-interface TestimonialsSectionProps {
-  testimonials: Testimonial[];
-}
-
-export function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    if (testimonials.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
-
+// All reviews visible at once (swipe row on mobile): no auto-rotation, which had no pause control (WCAG 2.2.2).
+export function TestimonialsSection({ testimonials }: { testimonials: Testimonial[] }) {
   if (testimonials.length === 0) return null;
 
   return (
-    <section className="bg-white py-12 sm:py-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={false}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center sm:mb-12"
+    <section aria-labelledby="testimonials-title" className="bg-cream py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-deep sm:text-sm">Ils me font confiance</p>
+        <h2 id="testimonials-title" className="mt-3 text-3xl font-black tracking-tight text-ink sm:text-4xl">
+          Ce que disent mes clients
+        </h2>
+
+        <ul
+          tabIndex={0}
+          aria-label="Avis clients, faites défiler pour tout lire"
+          className="-mx-4 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3"
         >
-          <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
-            CE QUE DISENT NOS{" "}
-            <span className="text-[#D99A12]">CLIENTS</span>
-          </h2>
-        </motion.div>
-
-        <div className="relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.4 }}
-              className="bg-[#F5F5F5] rounded-2xl p-8 md:p-12 text-center"
-            >
-              {/* Stars */}
-              <div className="flex justify-center gap-1 mb-6">
-                {Array.from({ length: testimonials[current].rating }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-[#D99A12] fill-current" />
-                ))}
-              </div>
-
-              {/* Quote */}
-              <p className="text-gray-700 text-lg leading-relaxed mb-8 italic">
-                "{testimonials[current].comment}"
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center justify-center gap-3">
-                {testimonials[current].photo ? (
-                  <Image
-                    src={testimonials[current].photo}
-                    alt={testimonials[current].name}
-                    width={48}
-                    height={48}
-                    unoptimized
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-[#D99A12] rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {testimonials[current].name.charAt(0)}
-                  </div>
-                )}
-                <div className="text-left">
-                  <p className="font-bold text-black">{testimonials[current].name}</p>
-                  <p className="text-sm text-gray-500">Client vérifié</p>
+          {testimonials.map((testimonial) => (
+            <li key={testimonial.id} className="w-[85%] shrink-0 snap-start sm:w-auto">
+              <figure className="flex h-full flex-col rounded-3xl bg-white p-6 ring-1 ring-black/10">
+                <div role="img" aria-label={`Note : ${testimonial.rating} sur 5`} className="flex gap-1">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Star
+                      key={i}
+                      aria-hidden
+                      className={`h-5 w-5 ${i < testimonial.rating ? "fill-gold text-gold" : "text-gray-300"}`}
+                    />
+                  ))}
                 </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Navigation */}
-          {testimonials.length > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-6">
-              <button
-                onClick={() => setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:border-[#D99A12] hover:text-[#D99A12] transition-colors"
-                aria-label="Précédent"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              <div className="flex gap-2">
-                {testimonials.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrent(i)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i === current ? "bg-[#D99A12] w-6" : "bg-gray-300"
-                    }`}
-                    aria-label={`Témoignage ${i + 1}`}
-                  />
-                ))}
-              </div>
-
-              <button
-                onClick={() => setCurrent((prev) => (prev + 1) % testimonials.length)}
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center hover:border-[#D99A12] hover:text-[#D99A12] transition-colors"
-                aria-label="Suivant"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-        </div>
+                <blockquote className="mt-4 flex-1 text-base leading-relaxed text-gray-800">
+                  « {testimonial.comment} »
+                </blockquote>
+                <figcaption className="mt-6 flex items-center gap-3">
+                  {testimonial.photo ? (
+                    <Image
+                      src={testimonial.photo}
+                      alt=""
+                      width={48}
+                      height={48}
+                      unoptimized
+                      className="h-12 w-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-lg font-bold text-gold"
+                    >
+                      {testimonial.name.charAt(0)}
+                    </span>
+                  )}
+                  <span>
+                    <span className="block font-bold text-ink">{testimonial.name}</span>
+                    <span className="block text-sm text-gray-600">Client vérifié</span>
+                  </span>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
