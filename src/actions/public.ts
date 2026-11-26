@@ -52,6 +52,41 @@ export async function getStores(category?: string, search?: string) {
   }
 }
 
+const activePromos = { where: { isActive: true }, orderBy: [{ displayOrder: "asc" as const }, { createdAt: "desc" as const }] };
+
+export async function getPromoStores() {
+  try {
+    return await prisma.store.findMany({
+      where: { isActive: true, promoProducts: { some: { isActive: true } } },
+      orderBy: { displayOrder: "asc" },
+      select: {
+        id: true, name: true, slug: true, logo: true,
+        _count: { select: { promoProducts: { where: { isActive: true } } } },
+        promoProducts: { ...activePromos, take: 4, select: { id: true, title: true, updatedAt: true } },
+      },
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function getStorePromos(slug: string) {
+  try {
+    return await prisma.store.findFirst({
+      where: { slug, isActive: true },
+      select: {
+        name: true, slug: true, logo: true, description: true,
+        promoProducts: {
+          ...activePromos,
+          select: { id: true, title: true, affiliateUrl: true, price: true, oldPrice: true, updatedAt: true },
+        },
+      },
+    });
+  } catch {
+    return null;
+  }
+}
+
 export async function getExchangeRates() {
   try {
     return await prisma.exchangeRate.findMany({

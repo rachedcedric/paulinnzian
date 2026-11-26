@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Package, Store, DollarSign, Star, HelpCircle,
   MessageSquare, Settings, LogOut, X, Users,
-  UserCog,
+  UserCog, BarChart3, Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,9 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/commandes", label: "Commandes", icon: Package },
   { href: "/admin/clients", label: "Clients", icon: Users },
+  { href: "/admin/statistiques", label: "Statistiques", icon: BarChart3 },
   { href: "/admin/boutiques", label: "Boutiques", icon: Store },
+  { href: "/admin/promos", label: "Promos", icon: Tag },
   { href: "/admin/tarifs", label: "Tarifs", icon: DollarSign },
   { href: "/admin/temoignages", label: "Témoignages", icon: Star },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },

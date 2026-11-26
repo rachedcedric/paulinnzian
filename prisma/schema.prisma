@@ -54,17 +54,18 @@ model AdminUser {
 }
 
 model Store {
-  id           String   @id @default(cuid())
-  name         String   @db.VarChar(100)
-  slug         String   @unique @db.VarChar(100)
-  logo         String?  @db.LongText
-  websiteUrl   String   @db.VarChar(2048)
-  category     String   @db.VarChar(80)
-  description  String?  @db.Text
-  isActive     Boolean  @default(true)
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String         @id @default(cuid())
+  name          String         @db.VarChar(100)
+  slug          String         @unique @db.VarChar(100)
+  logo          String?        @db.LongText
+  websiteUrl    String         @db.VarChar(2048)
+  category      String         @db.VarChar(80)
+  description   String?        @db.Text
+  isActive      Boolean        @default(true)
+  displayOrder  Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  promoProducts PromoProduct[]
 
   @@map("stores")
 }
@@ -212,4 +213,41 @@ model PublicRateLimit {
 
   @@index([expiresAt])
   @@map("public_rate_limits")
+}
+
+// Anonymous first-party audience events: no IP, no cookie, no visitor id.
+model SiteEvent {
+  id           String   @id @default(cuid())
+  type         String   @db.VarChar(10) // visit | page | click
+  path         String   @db.VarChar(300)
+  source       String   @db.VarChar(40)
+  referrerHost String?  @db.VarChar(255)
+  utmSource    String?  @db.VarChar(100)
+  utmMedium    String?  @db.VarChar(100)
+  utmCampaign  String?  @db.VarChar(150)
+  device       String   @db.VarChar(10)
+  target       String?  @db.VarChar(255) // clicked link host, for clicks
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([type, createdAt])
+  @@map("site_events")
+}
+
+model PromoProduct {
+  id           String   @id @default(cuid())
+  storeId      String
+  store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  title        String   @db.VarChar(150)
+  image        String   @db.LongText
+  affiliateUrl String   @db.VarChar(2048)
+  price        Float?
+  oldPrice     Float?
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([storeId, isActive])
+  @@map("promo_products")
 }

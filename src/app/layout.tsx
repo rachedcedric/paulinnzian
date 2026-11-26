@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { MarketingTracking } from "@/components/analytics/MarketingTracking";
+import { SiteStats } from "@/components/analytics/SiteStats";
 import { getSiteSettings } from "@/actions/public";
 
 const inter = Inter({
@@ -124,6 +125,7 @@ export default async function RootLayout({
           {children}
         </LayoutWrapper>
         <Toaster richColors position="top-right" />
+        <SiteStats />
         <MarketingTracking
           facebookPixelId={settings.facebook_pixel_id}
           googleAdsId={settings.google_ads_id}

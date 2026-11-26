@@ -24,6 +24,25 @@ export const storeSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
+export const DATA_IMAGE_PATTERN = /^data:(image\/(?:gif|jpeg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/;
+
+export const promoProductSchema = z
+  .object({
+    storeId: entityIdSchema,
+    title: z.string().trim().min(1, "Le titre est requis").max(150),
+    // Omitted on update to keep the stored image.
+    image: z.string().max(3_000_000).regex(DATA_IMAGE_PATTERN, "Image invalide").optional(),
+    affiliateUrl: z.string().trim().url("Lien invalide").regex(/^https:\/\//i, "Le lien doit commencer par https://").max(2_048),
+    price: z.number().min(0).max(100_000).nullable(),
+    oldPrice: z.number().min(0).max(100_000).nullable(),
+    displayOrder: z.number().int().min(0).max(10_000).default(0),
+    isActive: z.boolean().default(true),
+  })
+  .refine((data) => data.price == null || data.oldPrice == null || data.oldPrice > data.price, {
+    message: "L'ancien prix doit être supérieur au prix promo",
+    path: ["oldPrice"],
+  });
+
 export const orderSchema = z.object({
   trackingNumber: z.string().trim().min(3, "Le numéro de suivi est requis").max(100).transform((value) => value.toUpperCase()),
   customerName: z.string().trim().min(2, "Le nom est requis").max(100),
@@ -135,6 +154,7 @@ export const devisFormSchema = z.object({
 
 export type ContactFormData = z.infer<typeof contactSchema>;
 export type StoreFormData = z.infer<typeof storeSchema>;
+export type PromoProductFormData = z.input<typeof promoProductSchema>;
 export type OrderFormData = z.infer<typeof orderSchema>;
 export type OrderWeightFormData = z.infer<typeof orderWeightSchema>;
 export type TrackingEventFormData = z.infer<typeof trackingEventSchema>;

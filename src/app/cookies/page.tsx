@@ -16,6 +16,10 @@ export default function CookiesPage() {
         <p>Après acceptation, des outils Google, Meta et TikTok peuvent mesurer les visites et l'efficacité des campagnes. Ils peuvent déposer ou lire leurs propres identifiants. Aucun de ces scripts n'est chargé lorsque vous refusez.</p>
       </section>
       <section>
+        <h2>Statistiques anonymes</h2>
+        <p>Le site compte ses visites lui-même, sans cookie ni identifiant : page consultée, site ou campagne d'origine, type d'appareil et liens externes cliqués. Votre adresse IP n'est pas enregistrée. Une mémoire temporaire de l'onglet, effacée à sa fermeture, relie les pages d'une même visite. Ces chiffres servent uniquement à savoir d'où viennent les visiteurs et sont supprimés après 13 mois.</p>
+      </section>
+      <section>
         <h2>Modifier votre choix</h2>
         <p className="mb-5">Vous pouvez rouvrir le bandeau à tout moment. Un nouveau choix remplacera le précédent pour les prochaines visites.</p>
         <CookieSettingsButton />

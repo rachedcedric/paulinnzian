@@ -13,7 +13,9 @@ import {
   entityIdSchema,
   exchangeRateUpdateSchema,
   shippingRateUpdateSchema,
+  promoProductSchema,
 } from "@/lib/validations";
+import { isWhatsAppHost, sourceLabel } from "@/lib/site-stats";
 import {
   ORDER_EXPORT_MAX_ROWS,
   csvRow,
@@ -947,4 +949,149 @@ export async function adminGetMessages() {
 export async function adminGetSettings() {
   await requireSuperAdmin();
   return getCachedSiteSettings();
+}
+
+// ─── PROMOS ───────────────────────────────────────────────────────────────────
+function revalidatePromos() {
+  revalidatePath("/promos", "layout");
+  revalidatePath("/admin/promos");
+}
+
+export async function adminGetPromoProducts() {
+  await requireViewer();
+  return prisma.promoProduct.findMany({
+    orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
+    select: {
+      id: true, storeId: true, title: true, affiliateUrl: true, price: true, oldPrice: true,
+      isActive: true, displayOrder: true, updatedAt: true, store: { select: { name: true } },
+    },
+  });
+}
+
+export async function createPromoProduct(data: unknown) {
+  await requireManager();
+  const parsed = promoProductSchema.safeParse(data);
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+  const { image, ...fields } = parsed.data;
+  if (!image) return { success: false, error: "Ajoutez une image" };
+
+  try {
+    await prisma.promoProduct.create({ data: { ...fields, image } });
+  } catch {
+    return { success: false, error: "Boutique introuvable" };
+  }
+  revalidatePromos();
+  return { success: true };
+}
+
+export async function updatePromoProduct(id: string, data: unknown) {
+  await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
+  const parsed = promoProductSchema.safeParse(data);
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? "Données invalides" };
+  const { image, ...fields } = parsed.data;
+
+  try {
+    await prisma.promoProduct.update({ where: { id }, data: { ...fields, ...(image ? { image } : {}) } });
+  } catch {
+    return { success: false, error: "Article introuvable" };
+  }
+  revalidatePromos();
+  return { success: true };
+}
+
+export async function deletePromoProduct(id: string) {
+  await requireManager();
+  if (!isValidEntityId(id)) return invalidIdResult;
+  await prisma.promoProduct.deleteMany({ where: { id } });
+  revalidatePromos();
+  return { success: true };
+}
+
+// ─── SITE STATISTICS ──────────────────────────────────────────────────────────
+// Not exported: a "use server" file may export async functions only.
+const SITE_STATS_PERIODS = [7, 30, 90] as const;
+
+function countRows<T extends string>(rows: { key: T | null; count: number }[]) {
+  const totals = new Map<string, number>();
+  for (const row of rows) totals.set(row.key ?? "", (totals.get(row.key ?? "") ?? 0) + row.count);
+  return totals;
+}
+
+export async function adminGetSiteStats(days: number) {
+  await requireViewer();
+  const period = SITE_STATS_PERIODS.includes(days as (typeof SITE_STATS_PERIODS)[number]) ? days : 30;
+  const since = new Date(Date.now() - period * 86_400_000);
+  const inPeriod = { createdAt: { gte: since } };
+  const viewTypes = { in: ["visit", "page"] };
+
+  const [visitRows, clickRows, pageViews, pageRows, deviceRows, campaignRows, referrerRows, dailyRows] = await Promise.all([
+    prisma.siteEvent.groupBy({ by: ["source"], where: { ...inPeriod, type: "visit" }, _count: { _all: true } }),
+    prisma.siteEvent.groupBy({ by: ["source", "target"], where: { ...inPeriod, type: "click" }, _count: { _all: true } }),
+    prisma.siteEvent.count({ where: { ...inPeriod, type: viewTypes } }),
+    prisma.siteEvent.groupBy({
+      by: ["path"], where: { ...inPeriod, type: viewTypes }, _count: { path: true },
+      orderBy: { _count: { path: "desc" } }, take: 10,
+    }),
+    prisma.siteEvent.groupBy({ by: ["device"], where: { ...inPeriod, type: "visit" }, _count: { _all: true } }),
+    prisma.siteEvent.groupBy({
+      by: ["utmCampaign", "type", "target"],
+      where: { ...inPeriod, utmCampaign: { not: null }, type: { in: ["visit", "click"] } },
+      _count: { _all: true },
+    }),
+    prisma.siteEvent.groupBy({
+      by: ["referrerHost"], where: { ...inPeriod, type: "visit", source: "other" }, _count: { referrerHost: true },
+      orderBy: { _count: { referrerHost: "desc" } }, take: 10,
+    }),
+    prisma.$queryRaw<{ day: string; visits: bigint }[]>`
+      SELECT DATE_FORMAT(createdAt, '%Y-%m-%d') AS day, COUNT(*) AS visits
+      FROM site_events WHERE type = 'visit' AND createdAt >= ${since}
+      GROUP BY day ORDER BY day`,
+  ]);
+
+  const whatsappRows = clickRows.filter((row) => isWhatsAppHost(row.target));
+  const visitsBySource = countRows(visitRows.map((row) => ({ key: row.source, count: row._count._all })));
+  const whatsappBySource = countRows(whatsappRows.map((row) => ({ key: row.source, count: row._count._all })));
+  const sources = [...new Set([...visitsBySource.keys(), ...whatsappBySource.keys()])]
+    .map((source) => ({
+      source, label: sourceLabel(source),
+      visits: visitsBySource.get(source) ?? 0, whatsapp: whatsappBySource.get(source) ?? 0,
+    }))
+    .sort((a, b) => b.visits - a.visits || b.whatsapp - a.whatsapp);
+
+  const outbound = countRows(
+    clickRows.filter((row) => !isWhatsAppHost(row.target)).map((row) => ({ key: row.target, count: row._count._all })),
+  );
+
+  const campaigns = new Map<string, { visits: number; whatsapp: number }>();
+  for (const row of campaignRows) {
+    const entry = campaigns.get(row.utmCampaign ?? "") ?? { visits: 0, whatsapp: 0 };
+    if (row.type === "visit") entry.visits += row._count._all;
+    else if (isWhatsAppHost(row.target)) entry.whatsapp += row._count._all;
+    campaigns.set(row.utmCampaign ?? "", entry);
+  }
+
+  const dailyByDay = new Map(dailyRows.map((row) => [row.day, Number(row.visits)]));
+  const daily = Array.from({ length: period }, (_, index) => {
+    const day = new Date(Date.now() - (period - 1 - index) * 86_400_000).toISOString().slice(0, 10);
+    return { label: `${day.slice(8, 10)}/${day.slice(5, 7)}`, value: dailyByDay.get(day) ?? 0 };
+  });
+
+  const deviceLabels: Record<string, string> = { mobile: "Mobile", tablet: "Tablette", desktop: "Ordinateur" };
+  return {
+    period,
+    visits: [...visitsBySource.values()].reduce((sum, value) => sum + value, 0),
+    pageViews,
+    whatsappClicks: whatsappRows.reduce((sum, row) => sum + row._count._all, 0),
+    outboundClicks: [...outbound.values()].reduce((sum, value) => sum + value, 0),
+    sources,
+    outbound: [...outbound].map(([host, clicks]) => ({ host, clicks })).sort((a, b) => b.clicks - a.clicks).slice(0, 10),
+    campaigns: [...campaigns].map(([name, value]) => ({ name, ...value })).sort((a, b) => b.visits - a.visits),
+    pages: pageRows.map((row) => ({ path: row.path, views: row._count.path })),
+    devices: deviceRows
+      .map((row) => ({ label: deviceLabels[row.device] ?? row.device, visits: row._count._all }))
+      .sort((a, b) => b.visits - a.visits),
+    referrers: referrerRows.map((row) => ({ host: row.referrerHost ?? "", visits: row._count.referrerHost })),
+    daily,
+  };
 }

@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/db";
+import { DATA_IMAGE_PATTERN } from "@/lib/validations";
 
 export const dynamic = "force-dynamic";
-
-const DATA_IMAGE_PATTERN = /^data:(image\/(?:gif|jpeg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/;
 
 export async function GET() {
   const setting = await prisma.siteSetting.findUnique({
