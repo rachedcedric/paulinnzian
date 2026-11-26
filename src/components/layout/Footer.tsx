@@ -54,7 +54,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 title="Instagram"
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#E4405F] transition-colors"
               >
-                <FaInstagram className="w-4 h-4 text-white" />
+                <FaInstagram className="w-4 h-4 text-white" aria-hidden />
               </a>
               <a
                 href={facebookUrl}
@@ -64,7 +64,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 title="Facebook"
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#1877F2] transition-colors"
               >
-                <FaFacebookF className="w-4 h-4 text-white" />
+                <FaFacebookF className="w-4 h-4 text-white" aria-hidden />
               </a>
               <a
                 href={tiktokUrl}
@@ -74,7 +74,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 title="TikTok"
                 className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-white transition-colors group"
               >
-                <SiTiktok className="w-4 h-4 text-white group-hover:text-black" />
+                <SiTiktok className="w-4 h-4 text-white group-hover:text-black" aria-hidden />
               </a>
             </div>
           </div>
@@ -162,7 +162,6 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
             href="https://alizefret.com/"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Visiter le site d'Alizé Fret, partenaire transport (nouvel onglet)"
             className="inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3 transition-opacity hover:opacity-90"
           >
             <span className="font-display text-3xl italic leading-none text-[#1565C0]">alizé</span>
@@ -172,6 +171,7 @@ export function Footer({ facebookUrl, instagramUrl, tiktokUrl }: FooterProps) {
                 ENVOI COLIS GP
               </span>
             </span>
+            <span className="sr-only">(site du partenaire transport, nouvel onglet)</span>
           </a>
         </div>
 

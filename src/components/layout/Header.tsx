@@ -34,7 +34,7 @@ function Logo() {
       </div>
       <div className="leading-tight">
         <p className="font-black text-black text-sm sm:text-lg tracking-tight whitespace-nowrap">PAULIN N&apos;ZIAN</p>
-        <p className="text-[9px] sm:text-[10px] text-gray-500 font-semibold tracking-[0.2em] uppercase -mt-0.5">
+        <p className="text-[10px] text-gray-600 font-semibold tracking-[0.2em] uppercase -mt-0.5">
           Personal Shopper
         </p>
       </div>
