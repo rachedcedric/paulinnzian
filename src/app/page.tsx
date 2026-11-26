@@ -1,9 +1,8 @@
 import { HeroSection } from "@/components/home/HeroSection";
+import { SavingsSection } from "@/components/home/SavingsSection";
 import { HowToOrderSection } from "@/components/home/HowToOrderSection";
-import { StoresBand } from "@/components/home/StoresBand";
 import { PartnerStores } from "@/components/home/PartnerStores";
-import { TarifsTeaserSection } from "@/components/home/TarifsTeaserSection";
-import { ComparisonSection } from "@/components/home/ComparisonSection";
+import { StoresBand } from "@/components/home/StoresBand";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import { ContactSection } from "@/components/home/ContactSection";
@@ -19,14 +18,19 @@ export default async function HomePage() {
     getShippingRates(),
   ]);
 
+  // Cheapest per-kg tariff from Admin → Tarifs, quoted in the hero receipt and the price ticket.
+  const perKg = shippingRates
+    .filter((rate) => rate.pricingType === "PER_KG" && rate.price !== null)
+    .sort((a, b) => (a.price ?? 0) - (b.price ?? 0))[0];
+  const perKgRate = perKg?.price ? { name: perKg.name, price: perKg.price } : null;
+
   return (
     <>
-      <HeroSection stores={stores} />
-      <PartnerStores stores={stores} />
+      <HeroSection perKgRate={perKgRate} />
+      <SavingsSection shippingRates={shippingRates} perKgRate={perKgRate} />
       <HowToOrderSection />
+      <PartnerStores stores={stores} />
       <StoresBand stores={stores} />
-      <TarifsTeaserSection shippingRates={shippingRates} />
-      <ComparisonSection />
       <TestimonialsSection testimonials={testimonials} />
       <FAQSection faqs={faqs} />
       <ContactSection />
