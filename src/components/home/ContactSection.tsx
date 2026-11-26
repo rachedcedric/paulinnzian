@@ -1,98 +1,74 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { MapPin, MessageCircle, Phone } from "lucide-react";
 import { useSiteConfig } from "@/components/layout/SiteConfigContext";
 import { CommunityLinks } from "@/components/layout/CommunityLinks";
 
+/** Closing call to action, with every contact detail set in Admin → Paramètres. */
 export function ContactSection() {
-  const { whatsappUrl, whatsappNumber, phoneCi, addressParis, addressAbidjan, siteName } = useSiteConfig();
+  const { whatsappUrl, whatsappNumber, phoneCi, addressParis, addressAbidjan } = useSiteConfig();
+  const details = [
+    { icon: MessageCircle, label: "WhatsApp", value: whatsappNumber, href: whatsappUrl, external: true },
+    { icon: Phone, label: "Appels & SMS Côte d'Ivoire", value: phoneCi, href: `tel:${phoneCi.replace(/[^\d+]/g, "")}` },
+    { icon: MapPin, label: "Bureau Paris", value: addressParis },
+    { icon: MapPin, label: "Bureau Abidjan", value: addressAbidjan },
+  ];
+
   return (
-    <section className="bg-white py-12 sm:py-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={false}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 text-center sm:mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-black text-black mb-4">
-            NOUS <span className="text-[#D99A12]">CONTACTER</span>
+    <section
+      aria-labelledby="contact-title"
+      className="relative overflow-hidden bg-ink py-16 text-white sm:py-24 [--focus-ring:var(--gold)]"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-48 -right-40 h-[30rem] w-[30rem] rounded-full bg-gold/15 blur-3xl"
+      />
+      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-8">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold sm:text-sm">Disponible 7j/7</p>
+          <h2 id="contact-title" className="mt-3 text-4xl font-black leading-[1.05] tracking-tight sm:text-6xl">
+            Envoyez vos liens, <span className="font-display font-normal italic text-gold">je m&apos;occupe du reste.</span>
           </h2>
-          <p className="text-gray-600">Disponible 7j/7 pour répondre à vos questions.</p>
-        </motion.div>
-
-        <div className="max-w-xl mx-auto">
-          {/* Contact Info */}
-          <motion.div
-            initial={false}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-black rounded-3xl p-8 lg:p-10 text-white"
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-gray-300">
+            Un message suffit : je vous donne le montant exact en FCFA, j&apos;achète, puis j&apos;expédie vos colis
+            vers Abidjan et Dakar.
+          </p>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-gold px-8 py-4 text-base font-bold text-ink transition hover:bg-gold-premium sm:w-auto"
           >
-            <div className="mb-8">
-              <h3 className="text-2xl font-black text-white mb-1">{siteName}</h3>
-              <p className="text-[#D99A12] font-semibold">Personal Shopper</p>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#D99A12]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#D99A12]" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Paris</p>
-                  <p className="text-white font-semibold">{addressParis}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#D99A12]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#D99A12]" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Bureau Abidjan</p>
-                  <p className="text-white font-semibold">{addressAbidjan}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#25D366]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-5 h-5 text-[#25D366]" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">WhatsApp</p>
-                  <a href={whatsappUrl} className="text-[#25D366] font-semibold hover:underline">
-                    {whatsappNumber}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Appels & SMS CI</p>
-                  <p className="text-white font-semibold">{phoneCi}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20c058] text-white font-bold py-4 rounded-2xl transition-all"
-              >
-                <MessageCircle className="w-5 h-5" />
-                CONTACTER SUR WHATSAPP
-              </a>
-              <CommunityLinks className="mt-3 sm:flex-row" />
-            </div>
-          </motion.div>
+            <MessageCircle className="h-5 w-5" aria-hidden />
+            Écrire sur WhatsApp
+            <span className="sr-only">(nouvel onglet)</span>
+          </a>
+          <CommunityLinks className="mt-4 max-w-xl sm:flex-row" />
         </div>
+
+        <ul className="space-y-6 rounded-3xl bg-white/5 p-6 ring-1 ring-white/10 sm:p-8">
+          {details.map(({ icon: Icon, label, value, href, external }) => (
+            <li key={label} className="flex items-start gap-4">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gold/15">
+                <Icon className="h-5 w-5 text-gold" aria-hidden />
+              </span>
+              <span>
+                <span className="block text-xs font-semibold uppercase tracking-wide text-gray-400">{label}</span>
+                {href ? (
+                  <a
+                    href={href}
+                    {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="font-semibold text-white underline-offset-4 hover:underline"
+                  >
+                    {value}
+                  </a>
+                ) : (
+                  <span className="font-semibold text-white">{value}</span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
