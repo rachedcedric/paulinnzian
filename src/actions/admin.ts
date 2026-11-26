@@ -62,6 +62,7 @@ const SITE_SETTING_KEYS = new Set([
   "address_paris", "address_abidjan", "facebook_url", "instagram_url", "tiktok_url", "hero_title",
   "hero_subtitle", "meta_description", "facebook_pixel_id", "google_ads_id",
   "google_analytics_id", "tiktok_pixel_id",
+  // announcement_date is no longer shown, but stays accepted: the stored value comes back with every save.
   "announcement_enabled", "announcement_text", "announcement_link", "announcement_date",
   "hero_eyebrow", "hero_title_before", "hero_title_highlight", "hero_title_after",
   "hero_tagline", "hero_subtitle_text", "hero_cta_primary", "hero_cta_secondary", "hero_image",

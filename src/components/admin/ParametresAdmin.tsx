@@ -257,25 +257,14 @@ export function ParametresAdmin({ initialSettings }: { initialSettings: Record<s
             />
             Afficher la bande d&apos;annonce
           </label>
-          <div className="grid sm:grid-cols-[1fr_auto] gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-black mb-1">Message</label>
-              <input
-                value={settings.announcement_text || ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, announcement_text: e.target.value }))}
-                placeholder="Ex : Prochain départ Paris - Abidjan le"
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-black mb-1">Date</label>
-              <input
-                type="date"
-                value={settings.announcement_date || ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, announcement_date: e.target.value }))}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-semibold text-black mb-1">Message</label>
+            <input
+              value={settings.announcement_text || ""}
+              onChange={(e) => setSettings((prev) => ({ ...prev, announcement_text: e.target.value }))}
+              placeholder="Ex : Prochain départ Paris - Abidjan"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#D99A12] focus:outline-none"
+            />
           </div>
           <div>
             <label className="block text-sm font-semibold text-black mb-1">

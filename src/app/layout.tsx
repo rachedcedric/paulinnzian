@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { MarketingTracking } from "@/components/analytics/MarketingTracking";
 import { getSiteSettings } from "@/actions/public";
-import { formatAnnouncementText } from "@/lib/utils";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -82,10 +81,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const settings = await getSiteSettings();
-  const announcementText = formatAnnouncementText(
-    settings.announcement_text || "",
-    settings.announcement_date
-  );
+  const announcementText = settings.announcement_text || "";
 
   return (
     <html
