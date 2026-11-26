@@ -37,6 +37,7 @@ function defaultsFor(order: Order | null, kgRates: KgRateOption[], nextTrackingN
     trackingNumber: order.trackingNumber,
     customerName: order.customerName,
     customerPhone: order.customerPhone,
+    // No email field any more; kept so editing an older order does not erase its stored email.
     customerEmail: order.customerEmail || "",
     storeName: order.storeName || "",
     storeOrderNumber: order.storeOrderNumber || "",
@@ -149,14 +150,12 @@ export function OrderFormModal({ editing, kgRates, luxePercent, nextTrackingNumb
               <input {...register("customerPhone")} className={input} /></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div><label className="block text-xs font-semibold mb-1">Email</label>
-              <input {...register("customerEmail")} type="email" className={input} /></div>
             <div><label className="block text-xs font-semibold mb-1">Boutique</label>
               <input {...register("storeName")} className={input} /></div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="block text-xs font-semibold mb-1">Numéro commande boutique</label>
               <input {...register("storeOrderNumber")} className={input} /></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="block text-xs font-semibold mb-1">Date de commande</label>
               <input {...register("orderDate")} type="date" className={input} /></div>
           </div>
