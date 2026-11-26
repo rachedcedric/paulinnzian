@@ -48,11 +48,11 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     authors: [{ name: siteName }],
     creator: siteName,
-    alternates: { canonical: "https://paulinnzian.com" },
+    // Each page declares its own canonical path; a canonical set here would point every page at the home page.
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://paulinnzian.com"),
     openGraph: {
       type: "website",
       locale: "fr_FR",
-      url: "https://paulinnzian.com",
       siteName,
       title,
       description,

@@ -5,6 +5,7 @@ import { PricingClient } from "./PricingClient";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/tarifs" },
   title: "Tarifs",
   description: "Consultez nos tarifs d'expédition.",
 };

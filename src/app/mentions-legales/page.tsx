@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getSiteSettings } from "@/actions/public";
 import { LegalPage } from "@/components/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Mentions légales" };
+export const metadata: Metadata = { title: "Mentions légales", alternates: { canonical: "/mentions-legales" } };
 export const revalidate = 3600;
 
 export default async function LegalNoticePage() {

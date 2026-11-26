@@ -70,6 +70,10 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
           ))}
         </div>
 
+        <p className="mb-6 text-sm text-gray-500">
+          Certains liens sont des liens affiliés : si vous achetez via ces liens, je peux recevoir une petite commission, sans aucun surcoût pour vous.
+        </p>
+
         {/* Stores Grid */}
         {filtered.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
@@ -86,7 +90,7 @@ export function StoresClient({ initialStores }: { initialStores: Store[] }) {
                 key={store.id}
                 href={store.websiteUrl}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="sponsored noopener noreferrer"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.03 }}

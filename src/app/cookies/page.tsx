@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CookieSettingsButton } from "@/components/legal/CookieSettingsButton";
 import { LegalPage } from "@/components/legal/LegalPage";
 
-export const metadata: Metadata = { title: "Politique relative aux cookies" };
+export const metadata: Metadata = { title: "Politique relative aux cookies", alternates: { canonical: "/cookies" } };
 
 export default function CookiesPage() {
   return (

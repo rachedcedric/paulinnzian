@@ -7,6 +7,7 @@ import { getSiteSettings } from "@/actions/public";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/comment-ca-marche" },
   title: "Comment ça marche",
   description: "Découvrez comment fonctionne notre service de personal shopping.",
 };

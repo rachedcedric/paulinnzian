@@ -5,6 +5,7 @@ import { getStores } from "@/actions/public";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/boutiques" },
   title: "Boutiques en ligne",
   description: "Découvrez toutes les boutiques européennes sur lesquelles nous effectuons vos achats.",
 };

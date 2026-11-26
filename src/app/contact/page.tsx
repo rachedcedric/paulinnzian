@@ -6,6 +6,7 @@ import { getSiteSettings } from "@/actions/public";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact",
   description: "Contactez Paulin N'ZIAN, votre Personal Shopper.",
 };
