@@ -49,7 +49,8 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: siteName }],
     creator: siteName,
     // Each page declares its own canonical path; a canonical set here would point every page at the home page.
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://paulinnzian.com"),
+    // Fixed domain: NEXT_PUBLIC_* values are baked in at build time and a local .env says localhost.
+    metadataBase: new URL("https://paulinnzian.com"),
     openGraph: {
       type: "website",
       locale: "fr_FR",

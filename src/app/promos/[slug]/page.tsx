@@ -9,7 +9,6 @@ import { getWhatsAppLink } from "@/lib/utils";
 
 export const revalidate = 300;
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://paulinnzian.com";
 const euros = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
 const fcfa = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
 
@@ -21,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `Promos ${store.name}`,
     description: `Les articles ${store.name} en promo sélectionnés par Paulin N'ZIAN, livrés à Abidjan et Dakar.`,
-    alternates: { canonical: `${baseUrl}/promos/${store.slug}` },
+    alternates: { canonical: `/promos/${store.slug}` },
   };
 }
 

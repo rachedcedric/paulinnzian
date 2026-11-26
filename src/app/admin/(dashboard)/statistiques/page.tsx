@@ -4,7 +4,8 @@ import { BarChart } from "@/components/admin/BarChart";
 import { CampaignLinkBuilder } from "@/components/admin/CampaignLinkBuilder";
 
 const PERIODS = [7, 30, 90];
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://paulinnzian.com";
+// Campaign links always point at the live domain, whatever the build-time NEXT_PUBLIC_APP_URL says.
+const baseUrl = "https://paulinnzian.com";
 const nf = new Intl.NumberFormat("fr-FR");
 
 function rate(part: number, total: number) {

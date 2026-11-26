@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { HeroSection } from "@/components/home/HeroSection";
 import { SavingsSection } from "@/components/home/SavingsSection";
 import { HowToOrderSection } from "@/components/home/HowToOrderSection";
@@ -9,6 +10,8 @@ import { ContactSection } from "@/components/home/ContactSection";
 import { getTestimonials, getFAQs, getStores, getShippingRates } from "@/actions/public";
 
 export const revalidate = 300;
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomePage() {
   const [testimonials, faqs, stores, shippingRates] = await Promise.all([

@@ -29,7 +29,7 @@ export function StoresBand({ stores }: { stores: Store[] }) {
               <a
                 href={store.websiteUrl}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="sponsored noopener noreferrer"
                 className="group flex min-h-11 items-center gap-2 rounded-full bg-cream px-4 py-2 ring-1 ring-black/10 transition-colors hover:bg-ink"
               >
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">

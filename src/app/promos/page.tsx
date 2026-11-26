@@ -6,12 +6,10 @@ import { getPromoStores } from "@/actions/public";
 
 export const revalidate = 300;
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://paulinnzian.com";
-
 export const metadata: Metadata = {
   title: "Promos Temu, Shein et bons plans",
   description: "Les articles en promo repérés par Paulin N'ZIAN sur Temu, Shein et vos boutiques préférées, livrés à Abidjan et Dakar.",
-  alternates: { canonical: `${baseUrl}/promos` },
+  alternates: { canonical: "/promos" },
 };
 
 export default async function PromosPage() {

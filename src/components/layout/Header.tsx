@@ -10,7 +10,7 @@ import { useSiteConfig } from "./SiteConfigContext";
 // The logo links home, so no "Accueil" entry: that keeps room for one more link on desktop.
 const navLinks = [
   { href: "/boutiques", label: "Boutiques" },
-  // Promos slot: add { href: "/promos", label: "Promos" } here once the page exists.
+  { href: "/promos", label: "Promos" },
   { href: "/tarifs", label: "Tarifs" },
   { href: "/comment-ca-marche", label: "Comment ça marche" },
   { href: "/suivi", label: "Suivi de colis", icon: Package },
