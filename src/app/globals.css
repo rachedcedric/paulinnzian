@@ -8,6 +8,8 @@
   /* Premium homepage palette (Paris / Personal Shopper redesign) */
   --gold: #D99A12;
   --gold-premium: #C8912D;
+  /* Gold for text on light backgrounds: #D99A12 is only 2.4:1 on white, this is 5.4:1. */
+  --gold-deep: #8F6000;
   --ink: #090B10;
   --navy: #071225;
   --cream: #FAFAF8;
@@ -21,6 +23,7 @@
   --color-whatsapp: var(--whatsapp);
   --color-gold: var(--gold);
   --color-gold-premium: var(--gold-premium);
+  --color-gold-deep: var(--gold-deep);
   --color-ink: var(--ink);
   --color-navy: var(--navy);
   --color-cream: var(--cream);
@@ -52,16 +55,12 @@ body {
   }
 }
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
+/* Visible keyboard focus everywhere. Dark sections set --focus-ring to gold so the ring keeps 3:1 contrast.
+   In the base layer so components that style their own focus (admin inputs) still win. */
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--focus-ring, var(--ink));
+    outline-offset: 3px;
   }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  animation: marquee 22s linear infinite;
 }
 
