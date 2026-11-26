@@ -38,5 +38,5 @@ export function encodeWhatsAppMessage(message: string): string {
 
 export function getWhatsAppLink(base: string, message?: string): string {
   if (!message) return base;
-  return `${base}?text=${encodeWhatsAppMessage(message)}`;
+  return `${base}${base.includes("?") ? "&" : "?"}text=${encodeWhatsAppMessage(message)}`;
 }
