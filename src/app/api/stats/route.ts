@@ -31,6 +31,10 @@ export async function POST(request: Request) {
   const event = parsed.data;
   if (event.p.startsWith("/admin")) return noContent();
 
+  // The per-visitor key comes from X-Forwarded-For, which a client can forge; the site-wide cap bounds what a forger can write.
+  // shortcut: events beyond 2000 an hour go uncounted; raise the cap if real traffic gets near it.
+  const site = await consumeRateLimit("site-stats-global", "all", 2_000, 60 * 60 * 1000);
+  if (!site.allowed) return noContent();
   const limit = await consumeRateLimit("site-stats", await getRequestFingerprint(), 300, 60 * 60 * 1000);
   if (!limit.allowed) return noContent();
 
